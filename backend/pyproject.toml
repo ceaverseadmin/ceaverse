@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["**/migrations/**"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B", "I", "UP", "SIM", "RUF"]
+# RUF012: Django idiom (class attributes like ModelAdmin.ordering).
+# F405: names from ``from module import *`` in split-settings files.
+ignore = ["RUF012", "F405"]

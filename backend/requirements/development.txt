@@ -1,0 +1,8 @@
+-r base.txt
+pytest>=8.2
+pytest-django>=4.8
+factory-boy>=3.3
+faker>=26.0
+ruff>=0.5
+black>=24.4
+ipython>=8.26
