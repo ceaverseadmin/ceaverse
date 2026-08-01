@@ -15,7 +15,7 @@ const inputClass =
 
 const categories = [
   'classroom',
-  'lab',
+  'laboratory',
   'office',
   'service',
   'entrance',

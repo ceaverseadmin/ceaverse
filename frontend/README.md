@@ -1,32 +1,39 @@
-# React + TypeScript + Vite
+# EA-CSC Web Portal — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + TypeScript SPA for the EA-CSC Web Portal (Vite, Tailwind CSS v4,
+React Router, Axios, TanStack Query).
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev -- --host 127.0.0.1
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Open `http://127.0.0.1:5173`. The dev server proxies `/api` to the Django
+backend, which must run on `127.0.0.1:8000` (see the root `README.md`).
+
+## Scripts
+
+| Command               | Purpose                              |
+| --------------------- | ------------------------------------ |
+| `npm run dev`         | Start the Vite dev server            |
+| `npm run build`       | Typecheck + production build         |
+| `npm run typecheck`   | TypeScript check (`tsc -b --noEmit`) |
+| `npm run lint`        | Oxlint                               |
+| `npm run format`      | Prettier write                       |
+| `npm run format:check`| Prettier check                       |
+| `npm run preview`     | Preview the production build         |
+
+## Layout
+
+```
+src/
+  pages/       public pages (home, ebooks, lost & found, voice, ...)
+  admin/       admin dashboard pages
+  components/  shared UI (layout, PDF preview, feedback)
+  auth/        auth provider, route guard, auth hooks
+  lib/         api client, services, types, formatters
+  router.tsx   route definitions
+  lazyRoutes.tsx  code-split page imports
+```
