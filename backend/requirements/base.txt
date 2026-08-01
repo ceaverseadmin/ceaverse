@@ -12,3 +12,4 @@ cloudinary>=1.41
 django-cloudinary-storage>=0.3.0
 filetype>=1.2
 argon2-cffi>=23.1
+Pillow>=10.0
