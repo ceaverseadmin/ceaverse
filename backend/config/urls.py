@@ -11,6 +11,8 @@ urlpatterns = [
     path("api/ebooks/", include("ebooks.urls")),
     path("api/lost-found/", include("lost_found.urls")),
     path("api/voice/", include("student_voice.urls")),
+    path("api/floorplans/", include("floorplans.urls")),
+    path("api/wayfinding/", include("wayfinding.urls")),
 ]
 
 if settings.DEBUG:
