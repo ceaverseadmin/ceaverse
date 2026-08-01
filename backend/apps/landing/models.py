@@ -4,22 +4,10 @@ Single-instance sections (Hero, About, Mission, Vision, Contact) are always
 stored with ``pk=1``; multi-item lists (ServiceCard, DownloadableLink) are
 ordinary rows ordered by ``order``.
 """
-from common.upload import unique_upload_name
+from common.upload import UploadToPath
 from common.validators import validate_image, validate_pdf
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.deconstruct import deconstructible
-
-
-@deconstructible
-class UploadToPath:
-    """Serializable ``upload_to`` callable producing unique file names."""
-
-    def __init__(self, folder):
-        self.folder = folder
-
-    def __call__(self, instance, filename):
-        return unique_upload_name(filename, self.folder)
 
 
 class SingletonModel(models.Model):
