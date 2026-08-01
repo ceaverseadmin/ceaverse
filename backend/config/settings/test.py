@@ -17,8 +17,16 @@ DATABASES = {
     }
 }
 
-# Keep uploaded-file tests off Cloudinary.
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+# Keep uploaded-file tests off Cloudinary (no external credentials).
+STORAGES["default"]["BACKEND"] = "django.core.files.storage.FileSystemStorage"
+
+# Importing ``common.storage`` requires the cloudinary_storage app to be
+# configured. Dummy values satisfy that (uploads never reach Cloudinary).
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": "test",
+    "API_KEY": "test",
+    "API_SECRET": "test",
+}
 
 # Speed up tests.
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]

@@ -112,10 +112,19 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# ``STORAGES`` replaces the deprecated STATICFILES_STORAGE /
+# DEFAULT_FILE_STORAGE settings. The default backend is swapped to the custom
+# Cloudinary storage below when credentials are configured.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -145,7 +154,7 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
         "STATIC_TAG": "ea-csc-static",
         "EXCLUDE_DELETE_ORPHANED_MEDIA_PATTERNS": (),
     }
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    STORAGES["default"]["BACKEND"] = "common.storage.MediaAutoCloudinaryStorage"
 
 # ---------------------------------------------------------------------------
 # Django REST Framework
