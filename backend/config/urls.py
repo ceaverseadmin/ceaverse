@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/voice/", include("student_voice.urls")),
     path("api/floorplans/", include("floorplans.urls")),
     path("api/wayfinding/", include("wayfinding.urls")),
+    path("api/dashboard/", include("dashboard.urls")),
 ]
 
 if settings.DEBUG:
