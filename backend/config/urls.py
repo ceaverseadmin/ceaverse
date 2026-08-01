@@ -9,6 +9,7 @@ urlpatterns = [
     path("api/", include("accounts.urls")),
     path("api/landing/", include("landing.urls")),
     path("api/ebooks/", include("ebooks.urls")),
+    path("api/lost-found/", include("lost_found.urls")),
 ]
 
 if settings.DEBUG:
