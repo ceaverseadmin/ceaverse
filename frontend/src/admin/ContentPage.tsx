@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import Icon from '../components/Icon'
 import { ErrorState, Spinner } from '../components/Feedback'
 import {
   createDownloadableLink,
@@ -11,6 +12,7 @@ import {
   fetchServiceCards,
   updateSection,
 } from '../lib/adminServices'
+import { availableIcons } from '../lib/icons'
 import type { AboutSection, ContactSection, Hero, SimpleSection } from '../lib/types'
 
 const inputClass =
@@ -30,7 +32,7 @@ export default function ContentPage() {
   const [tab, setTab] = useState('Hero')
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Site Content</h1>
       <p className="mt-1 text-slate-500">Edit landing page sections and resources.</p>
 
@@ -142,7 +144,7 @@ function SectionFormBody({
         </p>
       )}
       {mutation.isError && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
           Could not save.
         </p>
       )}
@@ -230,15 +232,15 @@ function ServiceCardsManager() {
             className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
           >
             <div className="flex items-start justify-between">
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
-                {card.icon}
+              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 flex items-center gap-1">
+                <Icon name={card.icon} size={16} />
               </span>
               <button
                 onClick={() => {
                   if (window.confirm('Delete this card?'))
                     removeMutation.mutate(card.id)
                 }}
-                className="text-xs font-medium text-red-600 hover:text-red-700"
+                className="text-xs font-medium text-brand-600 hover:text-brand-700"
               >
                 Delete
               </button>
@@ -266,7 +268,7 @@ function ServiceCardForm({ onDone }: { onDone: () => void }) {
       onDone()
     },
   })
-  const [form, setForm] = useState({ icon: '', title: '', description: '', order: '0' })
+  const [form, setForm] = useState({ icon: 'book', title: '', description: '', order: '0' })
   const update = (key: string, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }))
 
@@ -279,13 +281,21 @@ function ServiceCardForm({ onDone }: { onDone: () => void }) {
       className="mt-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       <div className="grid gap-4 sm:grid-cols-2">
-        <input
-          required
-          placeholder="Icon (emoji)"
-          value={form.icon}
-          onChange={(e) => update('icon', e.target.value)}
-          className={inputClass}
-        />
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Icon</label>
+          <select
+            required
+            value={form.icon}
+            onChange={(e) => update('icon', e.target.value)}
+            className={inputClass}
+          >
+            {availableIcons.map((icon) => (
+              <option key={icon.name} value={icon.name}>
+                {icon.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <input
           required
           placeholder="Title"

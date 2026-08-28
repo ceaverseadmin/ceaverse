@@ -15,9 +15,11 @@ from .models import ActivityLog
 from .permissions import IsSuperAdmin
 from .serializers import (
     ActivityLogSerializer,
+    ApproveUserSerializer,
     CreateUserSerializer,
     EmailTokenObtainPairSerializer,
     ResetPasswordSerializer,
+    SignupSerializer,
     UpdateUserSerializer,
     UserSerializer,
 )
@@ -27,6 +29,7 @@ User = get_user_model()
 
 class LoginView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
+    permission_classes = ()  # Make this publicly accessible
     throttle_classes = (ScopedRateThrottle,)
     throttle_scope = "login"
 
@@ -95,6 +98,164 @@ class MeView(APIView):
                 "errors": None,
             }
         )
+
+    def patch(self, request):
+        """Allow users to update their own profile."""
+        serializer = UpdateUserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            log_action(
+                request.user,
+                ActivityLog.Action.UPDATE,
+                model_name="User",
+                object_id=request.user.id,
+                details={"action": "profile_update"},
+                request=request,
+            )
+            return Response(
+                {
+                    "success": True,
+                    "message": "Profile updated successfully.",
+                    "data": UserSerializer(request.user).data,
+                    "errors": None,
+                }
+            )
+        return Response(
+            {
+                "success": False,
+                "message": "Could not update profile.",
+                "data": None,
+                "errors": serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class SignupView(APIView):
+    """Public signup for new admin users (requires approval)."""
+
+    permission_classes = ()  # Make this publicly accessible
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = "login"
+
+    def post(self, request):
+        serializer = SignupSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            log_action(
+                None,  # No user yet for signup
+                ActivityLog.Action.CREATE,
+                model_name="User",
+                object_id=user.id,
+                details={"email": user.email, "action": "signup_pending_approval"},
+                request=request,
+            )
+            return Response(
+                {
+                    "success": True,
+                    "message": "Account created successfully. Your account is pending approval from a super admin.",
+                    "data": UserSerializer(user).data,
+                    "errors": None,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            {
+                "success": False,
+                "message": "Could not create account.",
+                "data": None,
+                "errors": serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class PendingUsersView(APIView):
+    """List pending user accounts awaiting approval (super admin only)."""
+
+    permission_classes = (IsSuperAdmin,)
+
+    def get(self, request):
+        pending_users = User.objects.filter(is_active=False, role=User.Role.ADMIN).order_by(
+            "-created_at"
+        )
+        serializer = UserSerializer(pending_users, many=True)
+        return Response(
+            {
+                "success": True,
+                "message": None,
+                "data": serializer.data,
+                "errors": None,
+            }
+        )
+
+
+class ApproveUserView(APIView):
+    """Approve or reject a pending user account (super admin only)."""
+
+    permission_classes = (IsSuperAdmin,)
+
+    def post(self, request, pk):
+        user = User.objects.get(pk=pk)
+        if user.is_active:
+            return Response(
+                {
+                    "success": False,
+                    "message": "User is already active.",
+                    "data": None,
+                    "errors": None,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        action = request.data.get("action")  # "approve" or "reject"
+        if action == "approve":
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+            log_action(
+                request.user,
+                ActivityLog.Action.UPDATE,
+                model_name="User",
+                object_id=user.id,
+                details={"action": "approve_user", "email": user.email},
+                request=request,
+            )
+            return Response(
+                {
+                    "success": True,
+                    "message": f"User {user.email} has been approved.",
+                    "data": UserSerializer(user).data,
+                    "errors": None,
+                }
+            )
+        elif action == "reject":
+            user.delete()
+            log_action(
+                request.user,
+                ActivityLog.Action.DELETE,
+                model_name="User",
+                object_id=pk,
+                details={"action": "reject_user", "email": user.email},
+                request=request,
+            )
+            return Response(
+                {
+                    "success": True,
+                    "message": f"User {user.email} has been rejected and deleted.",
+                    "data": None,
+                    "errors": None,
+                }
+            )
+        else:
+            return Response(
+                {
+                    "success": False,
+                    "message": "Invalid action. Use 'approve' or 'reject'.",
+                    "data": None,
+                    "errors": {"action": ["Must be 'approve' or 'reject'."]},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class UserViewSet(viewsets.ModelViewSet):

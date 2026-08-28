@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { Mail, Phone, Download } from 'lucide-react'
+import Icon from '../components/Icon'
 import { ErrorState, Spinner } from '../components/Feedback'
 import { fetchLandingContent } from '../lib/services'
 
@@ -25,7 +27,7 @@ export default function HomePage() {
             Engineering &amp; Architecture Student Council
           </p>
           <h1 className="max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
-            {hero.title || 'The EA-CSC Web Portal'}
+            {hero.title || 'The CEAVERSE Web Portal'}
           </h1>
           {hero.subtitle && (
             <p className="mt-4 max-w-2xl text-lg text-brand-100">{hero.subtitle}</p>
@@ -52,8 +54,8 @@ export default function HomePage() {
                 className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
               >
                 {card.icon && (
-                  <div className="mb-3 text-3xl" aria-hidden>
-                    {card.icon}
+                  <div className="mb-3 text-brand-600" aria-hidden>
+                    <Icon name={card.icon} size={32} />
                   </div>
                 )}
                 <h3 className="font-semibold text-slate-900">{card.title}</h3>
@@ -105,7 +107,9 @@ export default function HomePage() {
                     <p className="text-sm text-slate-500">{link.description}</p>
                   )}
                 </div>
-                <span className="text-brand-600">Download →</span>
+                <span className="text-brand-600 inline-flex items-center gap-1">
+                  Download <Download size={16} />
+                </span>
               </a>
             ))}
           </div>
@@ -139,8 +143,18 @@ export default function HomePage() {
         {contact.email || contact.phone ? (
           <div className="border-t border-slate-100 bg-slate-50">
             <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-slate-600">
-              {contact.email && <span className="mr-6">✉ {contact.email}</span>}
-              {contact.phone && <span className="mr-6">☎ {contact.phone}</span>}
+              {contact.email && (
+                <span className="mr-6">
+                  <Mail size={16} className="mr-1 align-text-bottom" />
+                  {contact.email}
+                </span>
+              )}
+              {contact.phone && (
+                <span className="mr-6">
+                  <Phone size={16} className="mr-1 align-text-bottom" />
+                  {contact.phone}
+                </span>
+              )}
               {contact.address && <span>{contact.address}</span>}
             </div>
           </div>

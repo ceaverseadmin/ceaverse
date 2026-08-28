@@ -9,6 +9,7 @@ export default function RequireAdmin() {
   if (loading) return <Spinner />
   if (!user) return <Navigate to="/admin/login" state={{ from: location }} replace />
   if (!isAdmin) return <Navigate to="/" replace />
+  if (user && !user.is_active) return <Navigate to="/admin/pending-approval" replace />
 
   return <Outlet />
 }

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { ErrorState, Spinner } from '../components/Feedback'
 import { formatDate, titleCase } from '../lib/format'
 import {
@@ -63,8 +64,8 @@ export default function UsersPage() {
   if (isError || !data) return <ErrorState message="Could not load users." />
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Users</h1>
           <p className="mt-1 text-slate-500">Manage admin and officer accounts.</p>
@@ -85,7 +86,7 @@ export default function UsersPage() {
 
       {showForm && <UserForm onSubmit={mutation.mutate} error={mutation.isError} />}
 
-      <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-slate-50">
             <tr>
@@ -141,7 +142,7 @@ export default function UsersPage() {
                         if (window.confirm(`Delete ${user.email}?`))
                           removeMutation.mutate(user.id)
                       }}
-                      className="rounded-md px-2 py-1 font-medium text-red-600 hover:bg-red-50"
+                      className="rounded-md px-2 py-1 font-medium text-brand-600 hover:bg-brand-50"
                     >
                       Delete
                     </button>
@@ -170,6 +171,7 @@ function UserForm({
     is_active: true,
     password: '',
   })
+  const [showPassword, setShowPassword] = useState(false)
   const update = (key: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }))
 
@@ -183,7 +185,7 @@ function UserForm({
     >
       <h2 className="font-semibold text-slate-900">New user</h2>
       {error && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
           Could not create the user. Check the email is unique and the password is
           valid.
         </p>
@@ -204,14 +206,24 @@ function UserForm({
           onChange={(e) => update('email', e.target.value)}
           className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
         />
-        <input
-          required
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={(e) => update('password', e.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
-        />
+        <div className="relative">
+          <input
+            required
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => update('password', e.target.value)}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 pr-10 text-sm outline-none focus:border-brand-500"
+          />
+          <button
+            type="button"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
         <select
           value={form.role}
           onChange={(e) => update('role', e.target.value)}

@@ -19,7 +19,7 @@ export default function FloorPlansAdminPage() {
   const [tab, setTab] = useState<'buildings' | 'floor-plans'>('buildings')
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Floor Plans</h1>
       <p className="mt-1 text-slate-500">Manage buildings and their floor plan PDFs.</p>
 
@@ -79,7 +79,7 @@ function BuildingsSection() {
       {(showForm || editing) && (
         <BuildingForm building={editing} onDone={() => setShowForm(false)} />
       )}
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-slate-50">
             <tr>
@@ -131,7 +131,7 @@ function BuildingsSection() {
                         )
                           removeMutation.mutate(building.id)
                       }}
-                      className="rounded-md px-2 py-1 font-medium text-red-600 hover:bg-red-50"
+                      className="rounded-md px-2 py-1 font-medium text-brand-600 hover:bg-brand-50"
                     >
                       Delete
                     </button>
@@ -195,7 +195,7 @@ function BuildingForm({
         {building ? 'Edit building' : 'Add building'}
       </h2>
       {mutation.isError && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
           Could not save.
         </p>
       )}
@@ -307,7 +307,7 @@ function FloorPlansSection() {
           onDone={() => setShowForm(false)}
         />
       )}
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-slate-50">
             <tr>
@@ -349,7 +349,7 @@ function FloorPlansSection() {
                       if (window.confirm(`Delete floor "${plan.floor_label}"?`))
                         removeMutation.mutate(plan.id)
                     }}
-                    className="rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                    className="rounded-md px-2 py-1 text-xs font-medium text-brand-600 hover:bg-brand-50"
                   >
                     Delete
                   </button>
@@ -408,7 +408,7 @@ function FloorPlanForm({
     >
       <h2 className="font-semibold text-slate-900">Add floor plan</h2>
       {mutation.isError && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
           Could not save. Make sure the PDF is valid and the floor label is unique for
           this building.
         </p>

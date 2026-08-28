@@ -6,7 +6,12 @@ import PublicLayout from './components/PublicLayout'
 import RequireAdmin from './auth/RequireAdmin'
 import AdminLayout from './admin/AdminLayout'
 import LoginPage from './admin/LoginPage'
+import SignupPage from './admin/SignupPage'
 import DashboardPage from './admin/DashboardPage'
+import AdminManagementPage from './admin/AdminManagementPage'
+import PendingApprovalPage from './admin/PendingApprovalPage'
+import ProfilePage from './admin/ProfilePage'
+import ActivityLogsPage from './admin/ActivityLogsPage'
 import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
 import {
@@ -35,8 +40,8 @@ const publicRoutes: RouteObject = {
   element: <PublicLayout />,
   children: [
     { path: '/', element: <HomePage /> },
-    { path: '/ebooks', element: withSuspense(<EbooksPage />) },
-    { path: '/ebooks/:id', element: withSuspense(<EbookDetailPage />) },
+    { path: '/library', element: withSuspense(<EbooksPage />) },
+    { path: '/library/:id', element: withSuspense(<EbookDetailPage />) },
     { path: '/lost-found', element: withSuspense(<LostFoundPage />) },
     { path: '/lost-found/submit', element: withSuspense(<LostFoundSubmitPage />) },
     { path: '/lost-found/track', element: withSuspense(<LostFoundTrackPage />) },
@@ -51,6 +56,8 @@ const adminRoutes: RouteObject = {
   children: [
     { index: true, element: <Navigate to="/admin/dashboard" replace /> },
     { path: 'login', element: <LoginPage /> },
+    { path: 'signup', element: <SignupPage /> },
+    { path: 'pending-approval', element: <PendingApprovalPage /> },
     {
       element: <RequireAdmin />,
       children: [
@@ -58,13 +65,16 @@ const adminRoutes: RouteObject = {
           element: <AdminLayout />,
           children: [
             { path: 'dashboard', element: <DashboardPage /> },
-            { path: 'ebooks', element: withSuspense(<EbooksAdminPage />) },
+            { path: 'library', element: withSuspense(<EbooksAdminPage />) },
             { path: 'lost-found', element: withSuspense(<LostFoundAdminPage />) },
             { path: 'voice', element: withSuspense(<VoiceAdminPage />) },
             { path: 'content', element: withSuspense(<ContentPage />) },
             { path: 'floor-plans', element: withSuspense(<FloorPlansAdminPage />) },
             { path: 'wayfinding', element: withSuspense(<WayfindingAdminPage />) },
+            { path: 'admin', element: <AdminManagementPage /> },
             { path: 'users', element: withSuspense(<UsersPage />) },
+            { path: 'profile', element: <ProfilePage /> },
+            { path: 'activity-logs', element: <ActivityLogsPage /> },
           ],
         },
       ],

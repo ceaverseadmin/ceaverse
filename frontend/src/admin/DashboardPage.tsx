@@ -15,13 +15,13 @@ export default function DashboardPage() {
   const { counts } = data
   const statCards = [
     { label: 'Users', value: counts.users.total },
-    { label: 'Ebooks', value: counts.books },
+    { label: 'Library', value: counts.books },
     { label: 'Buildings', value: counts.buildings },
     { label: 'Locations', value: counts.locations },
   ]
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
       <p className="mt-1 text-slate-500">Overview of portal activity.</p>
 
@@ -92,9 +92,9 @@ export default function DashboardPage() {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg bg-slate-50 p-3">
-      <dt className="text-xs uppercase tracking-wide text-slate-500">{label}</dt>
-      <dd className="mt-1 text-xl font-bold text-slate-900">{value}</dd>
+    <div className="rounded-lg bg-brand-50 p-3">
+      <dt className="text-xs uppercase tracking-wide text-brand-700">{label}</dt>
+      <dd className="mt-1 text-xl font-bold text-brand-900">{value}</dd>
     </div>
   )
 }

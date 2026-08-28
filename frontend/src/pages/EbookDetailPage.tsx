@@ -15,16 +15,16 @@ export default function EbookDetailPage() {
 
   if (isLoading) return <Spinner />
   if (isError || !data) {
-    return <ErrorState message="This ebook is not available." />
+    return <ErrorState message="This material is not available." />
   }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <Link
-        to="/ebooks"
+        to="/library"
         className="text-sm font-medium text-brand-600 hover:text-brand-700"
       >
-        ← Back to ebooks
+        ← Back to library
       </Link>
       <div className="mt-6 grid gap-10 md:grid-cols-[1fr_1.4fr]">
         <div>
@@ -58,6 +58,18 @@ export default function EbookDetailPage() {
                 <dd className="text-slate-900">{data.pages}</dd>
               </>
             )}
+            {data.year_level && (
+              <>
+                <dt className="text-slate-500">Year Level</dt>
+                <dd className="text-slate-900">{data.year_level}</dd>
+              </>
+            )}
+            {data.course && (
+              <>
+                <dt className="text-slate-500">Course</dt>
+                <dd className="text-slate-900">{data.course}</dd>
+              </>
+            )}
             <dt className="text-slate-500">Added</dt>
             <dd className="text-slate-900">{formatDate(data.created_at)}</dd>
           </dl>
@@ -76,7 +88,7 @@ export default function EbookDetailPage() {
       <div className="mt-12">
         <h2 className="text-xl font-bold text-slate-900">Preview</h2>
         <div className="mt-4">
-          <PdfPreview url={data.file} label="ebook" />
+          <PdfPreview url={data.file} label="material" />
         </div>
       </div>
     </div>

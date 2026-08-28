@@ -5,13 +5,26 @@ from django.db import models
 
 
 class Book(models.Model):
-    """A downloadable ebook (PDF) with an optional cover image."""
+    """A downloadable study material (PDF) with an optional cover image."""
 
     class Category(models.TextChoices):
         TEXTBOOK = "textbook", "Textbook"
         MODULE = "module", "Module"
         REFERENCE = "reference", "Reference"
         SYLLABUS = "syllabus", "Syllabus"
+
+    class YearLevel(models.TextChoices):
+        FIRST = "1st", "1st Year"
+        SECOND = "2nd", "2nd Year"
+        THIRD = "3rd", "3rd Year"
+        FOURTH = "4th", "4th Year"
+        FIFTH = "5th", "5th Year"
+
+    class Course(models.TextChoices):
+        BSCPE = "BSCpE", "BSCpE"
+        BSCE = "BSCE", "BSCE"
+        BSARCHI = "BSARCHI", "BSARCHI"
+        BSECE = "BSECE", "BSECE"
 
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200, blank=True)
@@ -28,6 +41,12 @@ class Book(models.Model):
     )
     category = models.CharField(
         max_length=20, choices=Category.choices, default=Category.TEXTBOOK
+    )
+    year_level = models.CharField(
+        max_length=10, choices=YearLevel.choices, blank=True, default=""
+    )
+    course = models.CharField(
+        max_length=10, choices=Course.choices, blank=True, default=""
     )
     pages = models.PositiveIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)

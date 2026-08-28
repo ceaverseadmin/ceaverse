@@ -48,7 +48,7 @@ export default function WayfindingAdminPage() {
   const buildingMap = new Map(buildings.data.results.map((b) => [b.id, b.name]))
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Wayfinding</h1>
       <p className="mt-1 text-slate-500">Manage building locations and rooms.</p>
 
@@ -71,7 +71,7 @@ export default function WayfindingAdminPage() {
         />
       )}
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-slate-50">
             <tr>
@@ -132,7 +132,7 @@ export default function WayfindingAdminPage() {
                         if (window.confirm(`Delete "${loc.name}"?`))
                           removeMutation.mutate(loc.id)
                       }}
-                      className="rounded-md px-2 py-1 font-medium text-red-600 hover:bg-red-50"
+                      className="rounded-md px-2 py-1 font-medium text-brand-600 hover:bg-brand-50"
                     >
                       Delete
                     </button>
@@ -196,7 +196,7 @@ function LocationForm({
         {location ? 'Edit location' : 'Add location'}
       </h2>
       {mutation.isError && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
           Could not save.
         </p>
       )}

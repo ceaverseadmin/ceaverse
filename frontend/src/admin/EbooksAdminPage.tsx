@@ -11,6 +11,8 @@ import {
 import type { Book } from '../lib/types'
 
 const categories = ['textbook', 'module', 'reference', 'syllabus']
+const yearLevels = ['1st', '2nd', '3rd', '4th', '5th']
+const courses = ['BSCpE', 'BSCE', 'BSARCHI', 'BSECE']
 
 const inputClass =
   'rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
@@ -38,20 +40,20 @@ export default function EbooksAdminPage() {
   })
 
   if (isLoading) return <Spinner />
-  if (isError || !data) return <ErrorState message="Could not load ebooks." />
+  if (isError || !data) return <ErrorState message="Could not load the library." />
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Ebooks</h1>
-          <p className="mt-1 text-slate-500">Manage the ebook catalog.</p>
+          <h1 className="text-2xl font-bold text-slate-900">Library</h1>
+          <p className="mt-1 text-slate-500">Manage the library catalog.</p>
         </div>
         <button
           onClick={() => setEditing('new')}
           className="rounded-md bg-brand-600 px-4 py-2 font-medium text-white hover:bg-brand-700"
         >
-          Add ebook
+          Add material
         </button>
       </div>
 
@@ -69,7 +71,7 @@ export default function EbooksAdminPage() {
         />
       )}
 
-      <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-slate-50">
             <tr>
@@ -81,6 +83,12 @@ export default function EbooksAdminPage() {
               </th>
               <th className="px-4 py-3 text-left font-semibold text-slate-600">
                 Category
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                Year
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                Course
               </th>
               <th className="px-4 py-3 text-left font-semibold text-slate-600">
                 Status
@@ -98,6 +106,10 @@ export default function EbooksAdminPage() {
                 <td className="px-4 py-3 text-slate-600">
                   {categoryLabel(book.category)}
                 </td>
+                <td className="px-4 py-3 text-slate-600">
+                  {book.year_level || '—'}
+                </td>
+                <td className="px-4 py-3 text-slate-600">{book.course || '—'}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -122,7 +134,7 @@ export default function EbooksAdminPage() {
                         if (window.confirm(`Delete "${book.title}"?`))
                           removeMutation.mutate(book.id)
                       }}
-                      className="rounded-md px-2 py-1 font-medium text-red-600 hover:bg-red-50"
+                      className="rounded-md px-2 py-1 font-medium text-brand-600 hover:bg-brand-50"
                     >
                       Delete
                     </button>
@@ -133,7 +145,7 @@ export default function EbooksAdminPage() {
           </tbody>
         </table>
         {data.results.length === 0 && (
-          <p className="p-6 text-center text-slate-500">No ebooks yet.</p>
+          <p className="p-6 text-center text-slate-500">No materials yet.</p>
         )}
       </div>
       {data.results.length > 0 && (
@@ -162,6 +174,8 @@ function BookForm({
     author: book?.author ?? '',
     description: book?.description ?? '',
     category: book?.category ?? 'textbook',
+    year_level: book?.year_level ?? '',
+    course: book?.course ?? '',
     pages: book?.pages?.toString() ?? '',
     order: book?.order?.toString() ?? '0',
     is_active: book?.is_active ?? true,
@@ -187,14 +201,14 @@ function BookForm({
       className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       <h2 className="font-semibold text-slate-900">
-        {book ? 'Edit ebook' : 'Add ebook'}
+        {book ? 'Edit material' : 'Add material'}
       </h2>
       {error && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
           Could not save. Check the PDF file is valid and all required fields are set.
         </p>
       )}
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
         <input
           required
           placeholder="Title"
@@ -216,6 +230,30 @@ function BookForm({
           {categories.map((c) => (
             <option key={c} value={c}>
               {categoryLabel(c)}
+            </option>
+          ))}
+        </select>
+        <select
+          value={form.year_level}
+          onChange={(e) => update('year_level', e.target.value)}
+          className={inputClass}
+        >
+          <option value="">Year Level</option>
+          {yearLevels.map((y) => (
+            <option key={y} value={y}>
+              {y} Year
+            </option>
+          ))}
+        </select>
+        <select
+          value={form.course}
+          onChange={(e) => update('course', e.target.value)}
+          className={inputClass}
+        >
+          <option value="">Course</option>
+          {courses.map((c) => (
+            <option key={c} value={c}>
+              {c}
             </option>
           ))}
         </select>
@@ -280,7 +318,7 @@ function BookForm({
           type="submit"
           className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
         >
-          {book ? 'Save changes' : 'Add ebook'}
+          {book ? 'Save changes' : 'Add material'}
         </button>
         <button
           type="button"

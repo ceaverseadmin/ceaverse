@@ -23,6 +23,8 @@ class BookSerializer(serializers.ModelSerializer):
             "cover",
             "file",
             "category",
+            "year_level",
+            "course",
             "pages",
             "is_active",
             "order",

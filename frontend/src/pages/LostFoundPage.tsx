@@ -73,7 +73,7 @@ export default function LostFoundPage() {
                 <span
                   className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                     item.item_type === 'lost'
-                      ? 'bg-red-100 text-red-700'
+                      ? 'bg-brand-100 text-brand-700'
                       : 'bg-emerald-100 text-emerald-700'
                   }`}
                 >

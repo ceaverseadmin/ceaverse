@@ -30,7 +30,7 @@ export default function VoiceAdminPage() {
     return <ErrorState message="Could not load voice submissions." />
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Student Voice</h1>
       <p className="mt-1 text-slate-500">Moderate the message queue.</p>
 
@@ -57,7 +57,7 @@ export default function VoiceAdminPage() {
                     submission.status === 'published'
                       ? 'bg-emerald-100 text-emerald-700'
                       : submission.status === 'rejected'
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-brand-100 text-brand-700'
                         : 'bg-amber-100 text-amber-700'
                   }`}
                 >
@@ -82,7 +82,7 @@ export default function VoiceAdminPage() {
                     statusMutation.mutate({ id: submission.id, status: 'rejected' })
                   }
                   disabled={submission.status === 'rejected'}
-                  className="rounded-md bg-red-600 px-3 py-1.5 font-medium text-white hover:bg-red-700 disabled:opacity-40"
+                  className="rounded-md bg-brand-600 px-3 py-1.5 font-medium text-white hover:bg-brand-700 disabled:opacity-40"
                 >
                   Reject
                 </button>

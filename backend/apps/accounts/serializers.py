@@ -59,6 +59,38 @@ class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(validators=[validate_password])
 
 
+class SignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password_confirm = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["email", "full_name", "password", "password_confirm"]
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password_confirm"]:
+            raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
+        return attrs
+
+    def create(self, validated_data):
+        validated_data.pop("password_confirm")
+        # Create user with admin role but inactive (pending approval)
+        user = User.objects.create_user(
+            email=validated_data["email"],
+            full_name=validated_data["full_name"],
+            password=validated_data["password"],
+            role=User.Role.ADMIN,
+            is_active=False,  # Requires approval
+        )
+        return user
+
+
+class ApproveUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["is_active"]
+
+
 class ActivityLogSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 

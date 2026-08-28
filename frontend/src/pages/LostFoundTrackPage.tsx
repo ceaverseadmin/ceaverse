@@ -64,7 +64,7 @@ export default function LostFoundTrackPage() {
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
                 data.item_type === 'lost'
-                  ? 'bg-red-100 text-red-700'
+                  ? 'bg-brand-100 text-brand-700'
                   : 'bg-emerald-100 text-emerald-700'
               }`}
             >

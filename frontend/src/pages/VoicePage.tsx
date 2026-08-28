@@ -19,7 +19,7 @@ const categoryColors: Record<string, string> = {
 }
 
 export default function VoicePage() {
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState('suggestion')
   const [name, setName] = useState('')
   const [content, setContent] = useState('')
   const [posted, setPosted] = useState(false)
@@ -63,7 +63,13 @@ export default function VoicePage() {
         )}
         {mutation.isError && (
           <div className="mb-4">
-            <ErrorState message="Could not submit your message. Please try again." />
+            <ErrorState
+              message={
+                mutation.error instanceof Error
+                  ? mutation.error.message
+                  : 'Could not submit your message. Please try again.'
+              }
+            />
           </div>
         )}
         <div className="flex flex-wrap gap-2">

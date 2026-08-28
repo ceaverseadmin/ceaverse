@@ -5,7 +5,7 @@ import { categoryLabel } from '../lib/format'
 export default function BookCard({ book }: { book: Book }) {
   return (
     <Link
-      to={`/ebooks/${book.id}`}
+      to={`/library/${book.id}`}
       className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
     >
       <div className="flex h-44 items-center justify-center bg-gradient-to-br from-brand-50 to-slate-100 p-4">

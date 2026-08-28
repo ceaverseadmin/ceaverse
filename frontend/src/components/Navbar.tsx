@@ -1,8 +1,9 @@
-import { Link, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
 
 const links = [
   { to: '/', label: 'Home' },
-  { to: '/ebooks', label: 'Ebooks' },
+  { to: '/library', label: 'Library' },
   { to: '/lost-found', label: 'Lost & Found' },
   { to: '/voice', label: 'Student Voice' },
   { to: '/floor-plans', label: 'Floor Plans' },
@@ -10,17 +11,47 @@ const links = [
 ]
 
 export default function Navbar() {
+  const [clickCount, setClickCount] = useState(0)
+
+  const handleLogoClick = () => {
+    setClickCount(prev => {
+      const newCount = prev + 1
+      
+      // Reset counter after 3 seconds if no more clicks
+      setTimeout(() => setClickCount(0), 3000)
+      
+      if (newCount >= 5) {
+        window.location.href = '/admin/login'
+        return 0
+      }
+      return newCount
+    })
+  }
+
+  // clickCount is used for Easter egg functionality (redirect to admin after 5 clicks)
+
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-semibold text-slate-900">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-            EA
-          </span>
+        <div 
+          className="flex items-center gap-2 font-semibold text-slate-900 cursor-pointer"
+          onClick={() => window.location.href = '/'}
+        >
+          <img 
+            src="/cea-logo.png" 
+            alt="CEAVERSE Logo" 
+            className={`h-9 w-9 rounded-lg transition-all ${
+              clickCount > 0 ? 'scale-110' : ''
+            }`}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleLogoClick()
+            }}
+          />
           <span>
-            EA-CSC <span className="font-normal text-slate-500">Portal</span>
+            CEAVERSE
           </span>
-        </Link>
+        </div>
         <nav className="hidden items-center gap-1 md:flex">
           {links.map((link) => (
             <NavLink

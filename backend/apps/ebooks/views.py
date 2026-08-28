@@ -15,7 +15,7 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     permission_classes = (IsAdminOrReadOnly,)
     http_method_names = ["get", "post", "patch", "delete"]
-    filterset_fields = ["category", "is_active"]
+    filterset_fields = ["category", "year_level", "course", "is_active"]
     search_fields = ["title", "author", "description"]
     ordering_fields = ["order", "created_at", "title"]
     ordering = ["order", "-created_at"]

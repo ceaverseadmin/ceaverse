@@ -172,10 +172,10 @@ class Command(BaseCommand):
         if force or not ServiceCard.objects.exists():
             for index, card in enumerate(
                 (
-                    ("📚", "Ebook library", "Download study materials and references."),
-                    ("🔍", "Lost & found", "Report and track lost items on campus."),
-                    ("🗣️", "Student voice", "Share feedback and shout-outs."),
-                    ("🧭", "Wayfinding", "Find rooms and offices by building."),
+                    ("book", "Ebook library", "Download study materials and references."),
+                    ("search", "Lost & found", "Report and track lost items on campus."),
+                    ("message-square", "Student voice", "Share feedback and shout-outs."),
+                    ("compass", "Wayfinding", "Find rooms and offices by building."),
                 )
             ):
                 ServiceCard.objects.create(

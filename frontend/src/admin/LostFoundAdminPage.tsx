@@ -32,11 +32,11 @@ export default function LostFoundAdminPage() {
     return <ErrorState message="Could not load lost & found reports." />
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Lost &amp; Found</h1>
       <p className="mt-1 text-slate-500">Review and manage student reports.</p>
 
-      <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-slate-50">
             <tr>
@@ -67,7 +67,7 @@ export default function LostFoundAdminPage() {
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                       item.item_type === 'lost'
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-brand-100 text-brand-700'
                         : 'bg-emerald-100 text-emerald-700'
                     }`}
                   >
@@ -99,7 +99,7 @@ export default function LostFoundAdminPage() {
                       if (window.confirm('Delete this report?'))
                         removeMutation.mutate(item.id)
                     }}
-                    className="rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                    className="rounded-md px-2 py-1 text-xs font-medium text-brand-600 hover:bg-brand-50"
                   >
                     Delete
                   </button>

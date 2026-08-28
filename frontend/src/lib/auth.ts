@@ -1,4 +1,4 @@
-import { api } from './api'
+import { api, unwrap } from './api'
 import type { ApiEnvelope } from './types'
 
 export interface AuthUser {
@@ -71,4 +71,24 @@ export async function refreshAccessToken(): Promise<AuthTokens | null> {
   })
   setTokens({ access: data.data.access, refresh: data.data.refresh })
   return data.data
+}
+
+export async function signup(
+  email: string,
+  full_name: string,
+  password: string,
+  password_confirm: string,
+): Promise<AuthUser> {
+  const { data } = await api.post<ApiEnvelope<AuthUser>>('/auth/signup/', {
+    email,
+    full_name,
+    password,
+    password_confirm,
+  })
+  return data.data
+}
+
+export async function updateProfile(data: { full_name?: string; password?: string }): Promise<AuthUser> {
+  const response = await api.patch<ApiEnvelope<AuthUser>>('/auth/me/', data)
+  return unwrap(response.data)
 }

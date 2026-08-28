@@ -49,7 +49,7 @@ export interface ContactSection {
 
 export interface ServiceCard {
   id: string
-  icon: string
+  icon: string // Should be a lucide-react icon name (e.g., 'book', 'search', 'message-square', 'compass')
   title: string
   description: string
   order: number
@@ -88,6 +88,8 @@ export interface Book {
   cover: string | null
   file: string
   category: string
+  year_level: string
+  course: string
   pages: number | null
   is_active: boolean
   order: number
@@ -97,6 +99,8 @@ export interface Book {
 
 export interface BookFilters {
   category?: string
+  year_level?: string
+  course?: string
   search?: string
   page?: number
 }

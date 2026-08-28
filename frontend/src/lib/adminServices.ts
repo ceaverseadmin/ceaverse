@@ -77,6 +77,41 @@ export async function deleteUser(id: string): Promise<void> {
   await api.delete(`/users/${id}/`)
 }
 
+export async function fetchPendingUsers(): Promise<AuthUser[]> {
+  const { data } = await api.get<ApiEnvelope<AuthUser[]>>('/users/pending/')
+  return unwrap(data)
+}
+
+export async function approveUser(userId: string): Promise<AuthUser> {
+  const { data } = await api.post<ApiEnvelope<AuthUser>>(
+    `/users/${userId}/approve/`,
+    { action: 'approve' },
+  )
+  return unwrap(data)
+}
+
+export async function rejectUser(userId: string): Promise<void> {
+  await api.post(`/users/${userId}/approve/`, { action: 'reject' })
+}
+
+export async function fetchActivityLogs(params?: {
+  action?: string
+  model_name?: string
+  user?: string
+}): Promise<Paginated<ActivityLogEntry>> {
+  const queryString = new URLSearchParams()
+  if (params?.action) queryString.append('action', params.action)
+  if (params?.model_name) queryString.append('model_name', params.model_name)
+  if (params?.user) queryString.append('user', params.user)
+
+  const url = queryString.toString()
+    ? `/activity-logs/?${queryString.toString()}`
+    : '/activity-logs/'
+
+  const { data } = await api.get<ApiEnvelope<Paginated<ActivityLogEntry>>>(url)
+  return unwrap(data)
+}
+
 export async function resetPassword(id: string, new_password: string): Promise<void> {
   await api.post(`/users/${id}/reset_password/`, { new_password })
 }
@@ -178,6 +213,8 @@ export interface BookPayload {
   author?: string
   description?: string
   category?: string
+  year_level?: string
+  course?: string
   pages?: number | null
   is_active?: boolean
   order?: number
