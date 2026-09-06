@@ -175,7 +175,7 @@ REST_FRAMEWORK = {
         "anon": "100/hour",
         "user": "1000/hour",
         "login": "10/minute",
-        "submit": "10/hour",
+        "submit": "500/hour",
     },
     "DEFAULT_RENDERER_CLASSES": ("common.renderers.ApiRenderer",),
     "EXCEPTION_HANDLER": "common.exceptions.api_exception_handler",
