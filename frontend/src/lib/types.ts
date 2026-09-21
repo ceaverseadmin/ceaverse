@@ -121,6 +121,7 @@ export interface LostFoundItem {
   date: string | null
   image: string | null
   status: string
+  claimed_at: string | null
   created_at: string
 }
 
@@ -142,6 +143,7 @@ export interface TrackResult {
   contact_name: string
   contact_email: string
   status: string
+  claimed_at: string | null
   created_at: string
 }
 

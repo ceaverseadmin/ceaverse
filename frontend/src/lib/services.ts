@@ -50,6 +50,7 @@ export async function fetchLostFound(
   filters: {
     item_type?: string
     category?: string
+    status?: string
   } = {},
 ): Promise<LostFoundItem[]> {
   const { data } = await api.get<ApiEnvelope<LostFoundItem[]>>('/lost-found/items/', {
@@ -70,6 +71,13 @@ export async function submitLostFound(payload: FormData): Promise<LostFoundSubmi
 export async function trackLostFound(code: string): Promise<TrackResult> {
   const { data } = await api.get<ApiEnvelope<TrackResult>>(
     `/lost-found/track/${encodeURIComponent(code)}/`,
+  )
+  return unwrap(data)
+}
+
+export async function claimLostFound(id: string): Promise<LostFoundItem> {
+  const { data } = await api.patch<ApiEnvelope<LostFoundItem>>(
+    `/lost-found/items/${id}/claim/`,
   )
   return unwrap(data)
 }
