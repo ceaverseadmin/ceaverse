@@ -7,6 +7,7 @@ from accounts.audit import log_action
 from accounts.models import ActivityLog
 from accounts.permissions import IsAdminOrHigher
 from django.db import IntegrityError
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -31,14 +32,22 @@ class PublicItemListView(APIView):
 
     def get(self, request):
         queryset = LostFoundItem.objects.filter(
-            is_public=True, status__in=[LostFoundItem.Status.OPEN, LostFoundItem.Status.MATCHED]
+            is_public=True,
+            status__in=[
+                LostFoundItem.Status.OPEN,
+                LostFoundItem.Status.MATCHED,
+                LostFoundItem.Status.RESOLVED,
+            ],
         )
         item_type = request.query_params.get("item_type")
         category = request.query_params.get("category")
+        status_filter = request.query_params.get("status")
         if item_type:
             queryset = queryset.filter(item_type=item_type)
         if category:
             queryset = queryset.filter(category=category)
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
         serializer = PublicItemSerializer(queryset[:50], many=True)
         return Response(
             {
@@ -105,6 +114,51 @@ class TrackItemView(APIView):
                 "success": True,
                 "message": None,
                 "data": serializer.data,
+                "errors": None,
+            }
+        )
+
+
+class ClaimItemView(APIView):
+    """Public action to mark an open report as claimed (resolved)."""
+
+    permission_classes = (AllowAny,)
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = "submit"
+
+    def patch(self, request, pk):
+        item = LostFoundItem.objects.filter(pk=pk, is_public=True).first()
+        if item is None:
+            return Response(
+                {
+                    "success": False,
+                    "message": "Report not found.",
+                    "data": None,
+                    "errors": None,
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        if item.status not in (
+            LostFoundItem.Status.OPEN,
+            LostFoundItem.Status.MATCHED,
+        ):
+            return Response(
+                {
+                    "success": False,
+                    "message": "This report is already claimed or closed.",
+                    "data": None,
+                    "errors": None,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        item.status = LostFoundItem.Status.RESOLVED
+        item.claimed_at = timezone.now()
+        item.save(update_fields=["status", "claimed_at", "updated_at"])
+        return Response(
+            {
+                "success": True,
+                "message": "Marked as claimed.",
+                "data": PublicItemSerializer(item).data,
                 "errors": None,
             }
         )

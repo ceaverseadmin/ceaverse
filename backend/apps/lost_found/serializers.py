@@ -30,9 +30,10 @@ class PublicItemSerializer(serializers.ModelSerializer):
             "date",
             "image",
             "status",
+            "claimed_at",
             "created_at",
         ]
-        read_only_fields = ["id", "status", "created_at"]
+        read_only_fields = ["id", "status", "claimed_at", "created_at"]
 
 
 class PublicCreateSerializer(PublicItemSerializer):
@@ -80,6 +81,7 @@ class TrackItemSerializer(serializers.ModelSerializer):
             "contact_name",
             "contact_email",
             "status",
+            "claimed_at",
             "created_at",
         ]
 
@@ -106,8 +108,15 @@ class AdminItemSerializer(serializers.ModelSerializer):
             "contact_name",
             "contact_email",
             "status",
+            "claimed_at",
             "is_public",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "tracking_code", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "tracking_code",
+            "claimed_at",
+            "created_at",
+            "updated_at",
+        ]

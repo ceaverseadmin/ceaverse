@@ -56,6 +56,7 @@ class LostFoundItem(models.Model):
     status = models.CharField(
         max_length=10, choices=Status.choices, default=Status.OPEN
     )
+    claimed_at = models.DateTimeField(null=True, blank=True)
     tracking_code = models.CharField(
         max_length=12, unique=True, default=_generate_tracking_code, editable=False
     )

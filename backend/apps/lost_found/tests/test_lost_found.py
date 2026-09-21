@@ -76,7 +76,10 @@ class TestPublicSubmission:
         response = api_client.post(ITEMS_URL, payload, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_submission_rate_limited(self, api_client):
+    def test_submission_rate_limited(self, api_client, monkeypatch):
+        from rest_framework.throttling import ScopedRateThrottle
+
+        monkeypatch.setattr(ScopedRateThrottle, "get_rate", lambda self: "10/hour")
         for _ in range(10):
             api_client.post(ITEMS_URL, submit_payload(), format="json")
         response = api_client.post(ITEMS_URL, submit_payload(), format="json")
@@ -109,11 +112,43 @@ class TestPublicLookup:
             **submit_payload(title="Private", is_public=False)
         )
         LostFoundItem.objects.create(
-            **submit_payload(title="Resolved", status=LostFoundItem.Status.RESOLVED)
+            **submit_payload(title="Closed", status=LostFoundItem.Status.CLOSED)
         )
         response = api_client.get(ITEMS_URL)
         titles = [item["title"] for item in env(response)["data"]]
         assert titles == ["Brown wallet near the canteen"]
+
+    def test_list_shows_claimed_items(self, api_client):
+        LostFoundItem.objects.create(**submit_payload())
+        LostFoundItem.objects.create(
+            **submit_payload(title="Claimed wallet", status=LostFoundItem.Status.RESOLVED)
+        )
+        response = api_client.get(ITEMS_URL)
+        titles = [item["title"] for item in env(response)["data"]]
+        assert set(titles) == {"Brown wallet near the canteen", "Claimed wallet"}
+
+    def test_list_filters_by_status(self, api_client):
+        LostFoundItem.objects.create(**submit_payload())
+        LostFoundItem.objects.create(
+            **submit_payload(title="Claimed wallet", status=LostFoundItem.Status.RESOLVED)
+        )
+        response = api_client.get(ITEMS_URL, {"status": "resolved"})
+        titles = [item["title"] for item in env(response)["data"]]
+        assert titles == ["Claimed wallet"]
+
+    def test_public_claim_marks_resolved(self, api_client):
+        item = LostFoundItem.objects.create(**submit_payload())
+        response = api_client.patch(f"{ITEMS_URL}{item.id}/claim/")
+        assert response.status_code == status.HTTP_200_OK
+        item.refresh_from_db()
+        assert item.status == LostFoundItem.Status.RESOLVED
+        assert item.claimed_at is not None
+
+    def test_public_claim_twice_is_rejected(self, api_client):
+        item = LostFoundItem.objects.create(**submit_payload())
+        api_client.patch(f"{ITEMS_URL}{item.id}/claim/")
+        response = api_client.patch(f"{ITEMS_URL}{item.id}/claim/")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_list_filters_by_type(self, api_client):
         LostFoundItem.objects.create(**submit_payload())
