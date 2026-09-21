@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { ErrorState, PageHeader, Spinner } from '../components/Feedback'
 import PdfPreview from '../components/PdfPreview'
 import { fetchBuilding, fetchBuildings } from '../lib/services'
 import type { BuildingDetail } from '../lib/types'
@@ -30,10 +30,11 @@ export default function FloorPlansPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl font-bold text-slate-900">CEA Floor Plans</h1>
-      <p className="mt-2 text-slate-600">
-        Browse PDF floor plans for each campus building.
-      </p>
+      <PageHeader
+        eyebrow="Facilities"
+        title="CEA Floor Plans"
+        subtitle="Browse PDF floor plans for each campus building."
+      />
 
       {buildings.results.length === 0 ? (
         <p className="mt-10 text-center text-slate-500">
@@ -42,17 +43,17 @@ export default function FloorPlansPage() {
       ) : (
         <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
           <aside>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
               Buildings
             </h2>
-            <ul className="mt-3 space-y-1">
+            <ul className="mt-3 space-y-1.5">
               {buildings.results.map((building) => (
                 <li key={building.id}>
                   <button
                     onClick={() => setSelected(building.id)}
-                    className={`w-full rounded-md px-3 py-2 text-left text-sm font-medium ${
+                    className={`w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition ${
                       detail?.id === building.id
-                        ? 'bg-brand-600 text-white'
+                        ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
                         : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
                     }`}
                   >
@@ -97,7 +98,7 @@ function BuildingDetailView({ building }: { building: BuildingDetail }) {
     building.floor_plans.find((f) => f.id === floor) ?? building.floor_plans[0]
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
       <h2 className="text-xl font-bold text-slate-900">{building.name}</h2>
       {building.description && (
         <p className="mt-1 text-sm text-slate-500">{building.description}</p>
@@ -107,9 +108,9 @@ function BuildingDetailView({ building }: { building: BuildingDetail }) {
           <button
             key={f.id}
             onClick={() => setFloor(f.id)}
-            className={`rounded-md px-4 py-2 text-sm font-medium ${
+            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
               currentFloor.id === f.id
-                ? 'bg-brand-600 text-white'
+                ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >

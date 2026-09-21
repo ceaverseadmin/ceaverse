@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { Megaphone } from 'lucide-react'
+import { EmptyState, ErrorState, PageHeader, Spinner } from '../components/Feedback'
 import { categoryLabel, formatDate } from '../lib/format'
 import { fetchVoiceWall, submitVoice } from '../lib/services'
 
@@ -47,17 +48,19 @@ export default function VoicePage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-3xl font-bold text-slate-900">Student Voice</h1>
-      <p className="mt-2 text-slate-600">
-        Share your thoughts with the council. Messages appear after review.
-      </p>
+      <PageHeader
+        eyebrow="Community"
+        title="Student Voice"
+        subtitle="Share your thoughts with the council. Messages appear after review."
+      />
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+        className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-card sm:p-7"
       >
         {posted && (
-          <p className="mb-4 rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <p className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <Megaphone className="h-4 w-4 shrink-0" aria-hidden />
             Message received! It will appear on the wall after review.
           </p>
         )}
@@ -78,9 +81,9 @@ export default function VoicePage() {
               type="button"
               key={c.value}
               onClick={() => setCategory(c.value)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium ${
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
                 category === c.value
-                  ? 'bg-brand-600 text-white'
+                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -94,33 +97,33 @@ export default function VoicePage() {
           onChange={(e) => setContent(e.target.value)}
           rows={3}
           placeholder="Write your message…"
-          className="mt-4 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          className="mt-4 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
         />
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name (optional — stays anonymous if blank)"
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 sm:flex-1"
+            className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 sm:flex-1"
           />
           <button
             type="submit"
             disabled={!content.trim() || mutation.isPending}
-            className="rounded-md bg-brand-600 px-5 py-2 font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+            className="rounded-xl bg-brand-600 px-5 py-2 font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:opacity-50"
           >
             {mutation.isPending ? 'Submitting…' : 'Share'}
           </button>
         </div>
       </form>
 
-      <div className="mt-10 flex gap-2">
+      <div className="mt-10 flex flex-wrap gap-2">
         {[{ value: '', label: 'All' }, ...categories].map((c) => (
           <button
             key={c.value}
             onClick={() => setCategory(c.value)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+            className={`rounded-xl px-3 py-1.5 text-sm font-medium transition ${
               category === c.value
-                ? 'bg-slate-800 text-white'
+                ? 'bg-slate-900 text-white shadow-sm shadow-slate-900/20'
                 : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
             }`}
           >
@@ -132,13 +135,18 @@ export default function VoicePage() {
       {isLoading && <Spinner />}
       {isError && <ErrorState message="Could not load the wall." />}
       {data && data.length === 0 && (
-        <p className="mt-10 text-center text-slate-500">No published messages yet.</p>
+        <div className="mt-6">
+          <EmptyState
+            title="No published messages yet"
+            description="Your message could be the first — share what's on your mind."
+          />
+        </div>
       )}
       <div className="mt-6 space-y-4">
         {data?.map((message) => (
           <div
             key={message.id}
-            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:border-brand-100"
           >
             <div className="flex items-center justify-between">
               <span
@@ -152,9 +160,12 @@ export default function VoicePage() {
                 {formatDate(message.created_at)}
               </span>
             </div>
-            <p className="mt-3 text-slate-800">{message.content}</p>
-            <p className="mt-3 text-sm font-medium text-slate-500">
-              — {message.display_name}
+            <p className="mt-3 leading-relaxed text-slate-800">{message.content}</p>
+            <p className="mt-4 flex items-center gap-2 text-sm font-medium text-slate-500">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-50 text-xs font-bold text-brand-700 ring-1 ring-brand-100">
+                {message.display_name.charAt(0).toUpperCase()}
+              </span>
+              {message.display_name}
             </p>
           </div>
         ))}

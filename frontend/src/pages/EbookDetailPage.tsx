@@ -22,18 +22,18 @@ export default function EbookDetailPage() {
     <div className="mx-auto max-w-6xl px-4 py-10">
       <Link
         to="/library"
-        className="text-sm font-medium text-brand-600 hover:text-brand-700"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 transition hover:text-brand-700"
       >
-        ← Back to library
+        <span aria-hidden>&larr;</span> Back to library
       </Link>
       <div className="mt-6 grid gap-10 md:grid-cols-[1fr_1.4fr]">
         <div>
-          <div className="flex aspect-[3/4] items-center justify-center rounded-xl border border-slate-200 bg-gradient-to-br from-brand-50 to-slate-100">
+          <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-brand-50 via-slate-50 to-slate-100 shadow-card">
             {data.cover ? (
               <img
                 src={data.cover}
                 alt={data.title}
-                className="h-full w-full rounded-xl object-cover"
+                className="h-full w-full rounded-2xl object-cover"
               />
             ) : (
               <span className="text-7xl font-bold text-brand-200">
@@ -43,7 +43,7 @@ export default function EbookDetailPage() {
           </div>
         </div>
         <div>
-          <span className="text-sm font-medium uppercase tracking-wide text-brand-600">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">
             {categoryLabel(data.category)}
           </span>
           <h1 className="mt-2 text-3xl font-bold text-slate-900">{data.title}</h1>
@@ -78,7 +78,7 @@ export default function EbookDetailPage() {
             download
             target="_blank"
             rel="noreferrer"
-            className="mt-8 inline-block rounded-md bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700"
+            className="mt-8 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
           >
             Download PDF
           </a>

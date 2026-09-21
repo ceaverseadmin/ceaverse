@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ErrorState } from '../components/Feedback'
+import { ErrorState, PageHeader } from '../components/Feedback'
 import { categoryLabel, formatDate, titleCase } from '../lib/format'
 import { trackLostFound } from '../lib/services'
 
@@ -27,26 +27,26 @@ export default function LostFoundTrackPage() {
     <div className="mx-auto max-w-2xl px-4 py-10">
       <Link
         to="/lost-found"
-        className="text-sm font-medium text-brand-600 hover:text-brand-700"
+        className="text-sm font-medium text-brand-600 transition hover:text-brand-700"
       >
         ← Back to Lost &amp; Found
       </Link>
-      <h1 className="mt-4 text-3xl font-bold text-slate-900">Check a report</h1>
-      <p className="mt-2 text-slate-600">
-        Enter the tracking code you received when you submitted your report.
-      </p>
+      <PageHeader
+        title="Check a report"
+        subtitle="Enter the tracking code you received when you submitted your report."
+      />
 
       <form onSubmit={handleLookup} className="mt-6 flex gap-3">
         <input
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           placeholder="e.g. LF-8K3D9QPA"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 font-mono outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          className="flex-1 rounded-xl border border-slate-300 px-3 py-2 font-mono outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
         />
         <button
           type="submit"
           disabled={!code.trim() || isFetching}
-          className="rounded-md bg-brand-600 px-5 py-2 font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+          className="rounded-xl bg-brand-600 px-5 py-2 font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:opacity-50"
         >
           {isFetching ? 'Checking…' : 'Check'}
         </button>
@@ -59,7 +59,7 @@ export default function LostFoundTrackPage() {
       )}
 
       {data && (
-        <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
           <div className="flex items-center justify-between">
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${

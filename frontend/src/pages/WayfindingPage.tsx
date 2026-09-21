@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { Search } from 'lucide-react'
+import { EmptyState, ErrorState, PageHeader, Spinner } from '../components/Feedback'
 import { categoryLabel } from '../lib/format'
 import { fetchBuildings, fetchLocations } from '../lib/services'
 
@@ -46,23 +47,30 @@ export default function WayfindingPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl font-bold text-slate-900">Wayfinding</h1>
-      <p className="mt-2 text-slate-600">
-        Find classrooms, labs, offices, and facilities across the campus.
-      </p>
+      <PageHeader
+        eyebrow="Navigate"
+        title="Wayfinding"
+        subtitle="Find classrooms, labs, offices, and facilities across the campus."
+      />
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => updateParam('search', e.target.value)}
-          placeholder="Search a room, office, or building…"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-        />
+      <div className="mt-6 flex flex-col gap-3 lg:flex-row">
+        <div className="relative flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => updateParam('search', e.target.value)}
+            placeholder="Search a room, office, or building…"
+            className="w-full rounded-xl border border-slate-300 py-2 pr-3 pl-9 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          />
+        </div>
         <select
           value={building}
           onChange={(e) => updateParam('building', e.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
+          className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
         >
           <option value="">All buildings</option>
           {buildings?.results.map((b) => (
@@ -74,7 +82,7 @@ export default function WayfindingPage() {
         <select
           value={category}
           onChange={(e) => updateParam('category', e.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
+          className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
         >
           {categoryOptions.map((c) => (
             <option key={c.value} value={c.value}>
@@ -87,10 +95,15 @@ export default function WayfindingPage() {
       {isLoading && <Spinner />}
       {isError && <ErrorState message="Could not load locations." />}
       {data && data.results.length === 0 && (
-        <p className="mt-10 text-center text-slate-500">No locations found.</p>
+        <div className="mt-8">
+          <EmptyState
+            title="No locations found"
+            description="Try a different search term or filter."
+          />
+        </div>
       )}
       {data && data.results.length > 0 && (
-        <div className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-slate-50">
               <tr>

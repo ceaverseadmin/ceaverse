@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
+import { Search } from 'lucide-react'
 import BookCard from '../components/BookCard'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { EmptyState, ErrorState, PageHeader, Spinner } from '../components/Feedback'
 import { fetchBooks } from '../lib/services'
 
 const categories = [
@@ -57,10 +58,11 @@ export default function EbooksPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl font-bold text-slate-900">Library</h1>
-      <p className="mt-2 text-slate-600">
-        Free reference materials, modules, and syllabi for EA students.
-      </p>
+      <PageHeader
+        eyebrow="Digital Library"
+        title="Library"
+        subtitle="Free reference materials, modules, and syllabi for EA students."
+      />
 
       <div className="mt-6 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -69,9 +71,9 @@ export default function EbooksPage() {
               <button
                 key={c.value}
                 onClick={() => setParam('category', c.value)}
-                className={`whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ${
+                className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition ${
                   category === c.value
-                    ? 'bg-brand-600 text-white'
+                    ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
                     : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
                 }`}
               >
@@ -79,13 +81,19 @@ export default function EbooksPage() {
               </button>
             ))}
           </div>
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setParam('search', e.target.value)}
-            placeholder="Search materials…"
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-          />
+          <div className="relative">
+            <Search
+              className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+              aria-hidden
+            />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setParam('search', e.target.value)}
+              placeholder="Search materials…"
+              className="rounded-xl border border-slate-300 py-2 pr-3 pl-9 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -93,9 +101,9 @@ export default function EbooksPage() {
             <button
               key={y.value}
               onClick={() => setParam('year_level', y.value)}
-              className={`whitespace-nowrap rounded-full px-3 py-1.5 font-medium ${
+              className={`whitespace-nowrap rounded-full px-3 py-1.5 font-medium transition ${
                 yearLevel === y.value
-                  ? 'bg-slate-900 text-white'
+                  ? 'bg-slate-900 text-white shadow-sm shadow-slate-900/20'
                   : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -109,9 +117,9 @@ export default function EbooksPage() {
             <button
               key={c.value}
               onClick={() => setParam('course', c.value)}
-              className={`whitespace-nowrap rounded-full px-3 py-1.5 font-medium ${
+              className={`whitespace-nowrap rounded-full px-3 py-1.5 font-medium transition ${
                 course === c.value
-                  ? 'bg-brand-600 text-white'
+                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
                   : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -124,7 +132,12 @@ export default function EbooksPage() {
       {isLoading && <Spinner />}
       {isError && <ErrorState message="Could not load the library catalog." />}
       {data && data.results.length === 0 && (
-        <p className="mt-10 text-center text-slate-500">No materials found.</p>
+        <div className="mt-8">
+          <EmptyState
+            title="No materials found"
+            description="Try adjusting your filters or search term."
+          />
+        </div>
       )}
       {data && data.results.length > 0 && (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
