@@ -3,8 +3,10 @@
 DRF FileField/ImageField serialise to absolute URLs (using the request
 context), so file-backed models expose ready-to-use URLs without extra fields.
 """
-from common.validators import validate_image, validate_pdf
+from django.core.validators import URLValidator
 from rest_framework import serializers
+
+from common.validators import validate_image, validate_pdf
 
 from .models import (
     AboutSection,
@@ -17,12 +19,30 @@ from .models import (
 )
 
 
+class URLOrPathField(serializers.CharField):
+    """Field that accepts an absolute URL or a site-relative path.
+
+    Link fields point to internal pages (e.g. a hero CTA to ``/library``) as
+    well as external URLs, but Django's ``URLField`` requires a scheme.
+    """
+
+    url_validator = URLValidator()
+
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data)
+        value = (value or "").strip()
+        if value and not value.startswith("/"):
+            self.url_validator(value)
+        return value
+
+
 class HeroSerializer(serializers.ModelSerializer):
     background_image = serializers.ImageField(
         required=False,
         allow_null=True,
         validators=[validate_image],
     )
+    cta_url = URLOrPathField(required=False, allow_blank=True)
 
     class Meta:
         model = Hero
@@ -66,6 +86,8 @@ class VisionSectionSerializer(serializers.ModelSerializer):
 
 
 class ContactSectionSerializer(serializers.ModelSerializer):
+    map_link = URLOrPathField(required=False, allow_blank=True)
+
     class Meta:
         model = ContactSection
         fields = [
