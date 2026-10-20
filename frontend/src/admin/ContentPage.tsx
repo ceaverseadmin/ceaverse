@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import Icon from '../components/Icon'
-import { ErrorState, Spinner } from '../components/Feedback'
+import {
+  ContentFormSkeleton,
+  DownloadableLinksSkeleton,
+  ServiceCardsSkeleton,
+} from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
 import {
   createDownloadableLink,
   createServiceCard,
@@ -89,7 +94,7 @@ function SectionForm({ path, simple }: { path: string; simple?: boolean }) {
       fetchSection<Hero | AboutSection | ContactSection | SimpleSection>(path),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <ContentFormSkeleton />
   if (isError || !data)
     return <ErrorState message={`Could not load ${path} section.`} />
 
@@ -311,7 +316,7 @@ function ServiceCardsManager() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['service-cards'] }),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <ServiceCardsSkeleton />
   if (isError || !data) return <ErrorState message="Could not load service cards." />
 
   return (
@@ -533,7 +538,7 @@ function DownloadableLinksManager() {
       queryClient.invalidateQueries({ queryKey: ['downloadable-links'] }),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <DownloadableLinksSkeleton />
   if (isError || !data)
     return <ErrorState message="Could not load downloadable links." />
 

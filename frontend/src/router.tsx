@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import type { RouteObject } from 'react-router-dom'
-import { Spinner } from './components/Feedback'
+import { RouteSkeleton } from './components/Skeleton'
 import PublicLayout from './components/PublicLayout'
 import RequireAdmin from './auth/RequireAdmin'
 import AdminLayout from './admin/AdminLayout'
@@ -30,7 +30,7 @@ import {
 } from './lazyRoutes'
 
 function withSuspense(node: React.ReactNode) {
-  return <Suspense fallback={<Spinner />}>{node}</Suspense>
+  return <Suspense fallback={<RouteSkeleton />}>{node}</Suspense>
 }
 
 const publicRoutes: RouteObject = {

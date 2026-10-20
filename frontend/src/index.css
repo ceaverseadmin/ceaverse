@@ -110,3 +110,28 @@
     }
   }
 }
+
+@layer utilities {
+  .nav-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.12) transparent;
+  }
+
+  .nav-scrollbar::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .nav-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .nav-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgb(255 255 255 / 0.12);
+    border: 0;
+    border-radius: 9999px;
+  }
+
+  .nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255 255 255 / 0.24);
+  }
+}

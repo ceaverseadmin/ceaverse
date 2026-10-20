@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { AdminTablePageSkeleton } from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
 import { Modal } from '../components/Modal'
 import { categoryLabel } from '../lib/format'
 import {
@@ -77,7 +78,8 @@ export default function EbooksAdminPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-books'] }),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading)
+    return <AdminTablePageSkeleton columns={7} rows={6} filters={5} actions />
   if (isError || !data) return <ErrorState message="Could not load the library." />
 
   const totalPages = Math.max(1, Math.ceil(data.count / pageSize))

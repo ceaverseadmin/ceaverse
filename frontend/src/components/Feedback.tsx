@@ -1,22 +1,6 @@
 import type { ReactNode } from 'react'
 import { AlertTriangle, Inbox } from 'lucide-react'
 
-export function Spinner({ label = 'Loading' }: { label?: string }) {
-  return (
-    <div
-      className="flex flex-col items-center justify-center gap-3 py-16"
-      role="status"
-      aria-label={label}
-    >
-      <span className="relative h-9 w-9" aria-hidden>
-        <span className="absolute inset-0 rounded-full border-2 border-brand-100" />
-        <span className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-brand-600" />
-      </span>
-      <span className="text-sm text-slate-500">{label}…</span>
-    </div>
-  )
-}
-
 export function ErrorState({
   message = 'Something went wrong.',
 }: {
@@ -69,16 +53,18 @@ export function PageHeader({
 }) {
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div className="max-w-2xl">
+      <div className="min-w-0 max-w-2xl">
         {eyebrow && (
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-600 sm:text-xs sm:tracking-[0.2em]">
             {eyebrow}
           </p>
         )}
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="mt-1 text-2xl font-bold tracking-tight break-words text-slate-900 sm:text-3xl">
           {title}
         </h1>
-        {subtitle && <p className="mt-2 text-slate-600">{subtitle}</p>}
+        {subtitle && (
+          <p className="mt-2 text-sm text-slate-600 sm:text-base">{subtitle}</p>
+        )}
       </div>
       {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
     </div>

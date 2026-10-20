@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ErrorState, Spinner } from '../../components/Feedback'
+import { AdminTableSkeleton } from '../../components/AdminSkeletons'
+import { ErrorState } from '../../components/Feedback'
 import { Modal } from '../../components/Modal'
+import { Skeleton, SkeletonStatus } from '../../components/Skeleton'
 import {
   createBuilding,
   deleteBuilding,
@@ -43,7 +45,17 @@ export function BuildingsSection() {
     },
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading)
+    return (
+      <div>
+        <div className="flex justify-end">
+          <Skeleton className="h-9 w-32" />
+        </div>
+        <SkeletonStatus label="Loading buildings" className="mt-4">
+          <AdminTableSkeleton columns={4} rows={5} />
+        </SkeletonStatus>
+      </div>
+    )
   if (isError || !data) return <ErrorState message="Could not load buildings." />
 
   return (

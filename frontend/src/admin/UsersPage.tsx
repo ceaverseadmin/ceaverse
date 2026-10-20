@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { AdminTablePageSkeleton } from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
 import { Modal } from '../components/Modal'
 import type { AuthUser } from '../lib/auth'
 import { formatDate, titleCase } from '../lib/format'
@@ -60,7 +61,7 @@ export default function UsersPage() {
     },
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <AdminTablePageSkeleton columns={5} rows={6} actions />
   if (isError || !data) return <ErrorState message="Could not load users." />
 
   return (

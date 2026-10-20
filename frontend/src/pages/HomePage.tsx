@@ -11,7 +11,8 @@ import {
 } from 'lucide-react'
 import { HeroPreview } from '../components/HeroPreview'
 import { LogoMarquee } from '../components/LogoMarquee'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { ErrorState } from '../components/Feedback'
+import { HomePageSkeleton } from '../components/PublicSkeletons'
 import { fetchLandingContent } from '../lib/services'
 
 function SectionHeading({
@@ -66,7 +67,7 @@ export default function HomePage() {
     queryFn: fetchLandingContent,
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <HomePageSkeleton />
   if (isError || !data)
     return <ErrorState message="Could not load the portal content." />
 

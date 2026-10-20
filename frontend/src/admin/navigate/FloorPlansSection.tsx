@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ErrorState, Spinner } from '../../components/Feedback'
+import { AdminTableSkeleton } from '../../components/AdminSkeletons'
+import { ErrorState } from '../../components/Feedback'
 import { Modal } from '../../components/Modal'
 import PdfViewer from '../../components/PdfViewer'
+import { PdfPageSkeleton, Skeleton, SkeletonStatus } from '../../components/Skeleton'
 import {
   createFloorPlan,
   deleteFloorPlan,
@@ -44,7 +46,21 @@ export function FloorPlansSection() {
     },
   })
 
-  if (isLoading || buildings.isLoading) return <Spinner />
+  if (isLoading || buildings.isLoading)
+    return (
+      <div>
+        <div className="flex justify-end">
+          <Skeleton className="h-9 w-36" />
+        </div>
+        <SkeletonStatus
+          label="Loading floor plans"
+          className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start"
+        >
+          <AdminTableSkeleton columns={4} rows={5} />
+          <PdfPageSkeleton className="min-h-40" />
+        </SkeletonStatus>
+      </div>
+    )
   if (isError || !data || buildings.isError || !buildings.data)
     return <ErrorState message="Could not load floor plans." />
 

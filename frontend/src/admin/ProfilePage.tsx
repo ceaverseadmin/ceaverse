@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
-import { Spinner } from '../components/Feedback'
+import { ProfileSkeleton } from '../components/AdminSkeletons'
 import { fetchMe } from '../lib/auth'
 import { formatDate } from '../lib/format'
 import { api, unwrap } from '../lib/api'
@@ -22,11 +22,16 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error'
+    text: string
+  } | null>(null)
 
   const profileMutation = useMutation({
     mutationFn: (data: { full_name?: string }) => {
-      return api.patch<ApiEnvelope<AuthUser>>('/auth/me/', data).then(res => unwrap(res.data))
+      return api
+        .patch<ApiEnvelope<AuthUser>>('/auth/me/', data)
+        .then((res) => unwrap(res.data))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
@@ -40,7 +45,9 @@ export default function ProfilePage() {
 
   const passwordMutation = useMutation({
     mutationFn: (data: { password: string }) => {
-      return api.patch<ApiEnvelope<AuthUser>>('/auth/me/', data).then(res => unwrap(res.data))
+      return api
+        .patch<ApiEnvelope<AuthUser>>('/auth/me/', data)
+        .then((res) => unwrap(res.data))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
@@ -54,7 +61,7 @@ export default function ProfilePage() {
     },
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <ProfileSkeleton />
 
   const displayUser = currentUser || user
 
@@ -80,12 +87,16 @@ export default function ProfilePage() {
   return (
     <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Profile</h1>
-      <p className="mt-1 text-slate-500">Manage your account settings and preferences.</p>
+      <p className="mt-1 text-slate-500">
+        Manage your account settings and preferences.
+      </p>
 
       {message && (
         <div
           className={`mt-4 rounded-md px-4 py-3 ${
-            message.type === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-brand-50 text-brand-800'
+            message.type === 'success'
+              ? 'bg-emerald-50 text-emerald-800'
+              : 'bg-brand-50 text-brand-800'
           }`}
         >
           {message.text}
@@ -108,7 +119,9 @@ export default function ProfilePage() {
               <p className="mt-1 text-xs text-slate-500">Email cannot be changed</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700">Full Name</label>
+              <label className="block text-sm font-medium text-slate-700">
+                Full Name
+              </label>
               <input
                 type="text"
                 value={fullName || displayUser?.full_name || ''}
@@ -141,7 +154,9 @@ export default function ProfilePage() {
           <div className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-slate-600">Account Status</span>
-              <span className={`font-medium ${displayUser?.is_active ? 'text-emerald-600' : 'text-amber-600'}`}>
+              <span
+                className={`font-medium ${displayUser?.is_active ? 'text-emerald-600' : 'text-amber-600'}`}
+              >
                 {displayUser?.is_active ? 'Active' : 'Pending Approval'}
               </span>
             </div>
@@ -174,7 +189,9 @@ export default function ProfilePage() {
           <h2 className="font-semibold text-slate-900">Change Password</h2>
           <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
             <div className="relative">
-              <label className="block text-sm font-medium text-slate-700">New Password</label>
+              <label className="block text-sm font-medium text-slate-700">
+                New Password
+              </label>
               <input
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
@@ -188,7 +205,11 @@ export default function ProfilePage() {
                 onClick={() => setShowNewPassword((v) => !v)}
                 className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
               >
-                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showNewPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
             <div className="relative">
@@ -208,7 +229,11 @@ export default function ProfilePage() {
                 onClick={() => setShowConfirm((v) => !v)}
                 className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
               >
-                {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showConfirm ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
             <button

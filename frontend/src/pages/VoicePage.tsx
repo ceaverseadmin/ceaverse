@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Megaphone } from 'lucide-react'
-import { EmptyState, ErrorState, PageHeader, Spinner } from '../components/Feedback'
+import { EmptyState, ErrorState, PageHeader } from '../components/Feedback'
+import { VoicePageSkeleton } from '../components/PublicSkeletons'
 import { categoryLabel, formatDate } from '../lib/format'
 import { fetchVoiceWall, submitVoice } from '../lib/services'
 
@@ -134,7 +135,7 @@ export default function VoicePage() {
         ))}
       </div>
 
-      {isLoading && <Spinner />}
+      {isLoading && <VoicePageSkeleton />}
       {isError && <ErrorState message="Could not load the wall." />}
       {data && data.length === 0 && (
         <div className="mt-6">

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { AdminTablePageSkeleton } from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
 import { categoryLabel, formatDate, titleCase } from '../lib/format'
 import {
   deleteLostFoundItem,
@@ -27,7 +28,7 @@ export default function LostFoundAdminPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-lost-found'] }),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <AdminTablePageSkeleton columns={5} rows={6} />
   if (isError || !data)
     return <ErrorState message="Could not load lost & found reports." />
 

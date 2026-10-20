@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { VoiceSubmissionsSkeleton } from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
 import { categoryLabel, formatDate } from '../lib/format'
 import {
   deleteVoiceSubmission,
@@ -25,7 +26,7 @@ export default function VoiceAdminPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-voice'] }),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <VoiceSubmissionsSkeleton />
   if (isError || !data)
     return <ErrorState message="Could not load voice submissions." />
 

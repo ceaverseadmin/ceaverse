@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import BookCard from '../components/BookCard'
-import { EmptyState, ErrorState, PageHeader, Spinner } from '../components/Feedback'
+import { EmptyState, ErrorState, PageHeader } from '../components/Feedback'
+import { EbooksPageSkeleton } from '../components/PublicSkeletons'
 import { fetchBooks } from '../lib/services'
 
 const categories = [
@@ -117,7 +118,7 @@ export default function EbooksPage() {
         </div>
       </div>
 
-      {isLoading && <Spinner />}
+      {isLoading && <EbooksPageSkeleton />}
       {isError && <ErrorState message="Could not load the library catalog." />}
       {data && data.results.length === 0 && (
         <div className="mt-8">

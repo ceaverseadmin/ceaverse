@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { ErrorState } from '../components/Feedback'
 import PdfPreview from '../components/PdfPreview'
+import { BookDetailSkeleton } from '../components/PublicSkeletons'
 import { categoryLabel, formatDate } from '../lib/format'
 import { fetchBook } from '../lib/services'
 
@@ -13,7 +14,7 @@ export default function EbookDetailPage() {
     enabled: Boolean(id),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <BookDetailSkeleton />
   if (isError || !data) {
     return <ErrorState message="This material is not available." />
   }

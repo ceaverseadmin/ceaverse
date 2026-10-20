@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { AdminTableSkeleton } from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
+import { SkeletonStatus } from '../components/Skeleton'
 import { formatDate, titleCase } from '../lib/format'
 import { fetchActivityLogs } from '../lib/adminServices'
 
@@ -39,7 +41,9 @@ export default function ActivityLogsPage() {
 
       <div className="mt-6 flex flex-wrap gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Action</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Action
+          </label>
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
@@ -64,7 +68,11 @@ export default function ActivityLogsPage() {
         </div>
       </div>
 
-      {isLoading && <Spinner />}
+      {isLoading && (
+        <SkeletonStatus label="Loading activity logs" className="mt-6">
+          <AdminTableSkeleton columns={6} rows={6} />
+        </SkeletonStatus>
+      )}
       {isError && <ErrorState message="Could not load activity logs." />}
 
       {data && logs.length === 0 && (
@@ -78,12 +86,24 @@ export default function ActivityLogsPage() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">User</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">Action</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">Model</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">Details</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">IP Address</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">Time</th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                  User
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                  Action
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                  Model
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                  Details
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                  IP Address
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-600">
+                  Time
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -113,7 +133,9 @@ export default function ActivityLogsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-slate-600">{log.ip_address || '—'}</td>
-                  <td className="px-4 py-3 text-slate-600">{formatDate(log.created_at)}</td>
+                  <td className="px-4 py-3 text-slate-600">
+                    {formatDate(log.created_at)}
+                  </td>
                 </tr>
               ))}
             </tbody>

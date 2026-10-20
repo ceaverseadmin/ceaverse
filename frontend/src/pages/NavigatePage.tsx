@@ -1,8 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { FileText, Search } from 'lucide-react'
+import { Building2, FileText, Layers3, Search } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
-import { EmptyState, ErrorState, PageHeader, Spinner } from '../components/Feedback'
+import { EmptyState, ErrorState, PageHeader } from '../components/Feedback'
 import PdfViewer from '../components/PdfViewer'
+import {
+  FloorPlanPanelSkeleton,
+  NavigatePageSkeleton,
+  RoomListSkeleton,
+} from '../components/PublicSkeletons'
 import { categoryLabel } from '../lib/format'
 import { fetchBuilding, fetchBuildings, fetchLocations } from '../lib/services'
 
@@ -93,7 +98,7 @@ export default function NavigatePage() {
   )
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-6xl px-3 py-8 sm:px-4 sm:py-10">
       <PageHeader
         eyebrow="Campus"
         title="Navigate"
@@ -134,7 +139,7 @@ export default function NavigatePage() {
         </div>
       )}
 
-      {buildingsLoading && <Spinner label="Loading buildings" />}
+      {buildingsLoading && <NavigatePageSkeleton />}
 
       {buildings && buildings.results.length === 0 && (
         <div className="mt-8">
@@ -148,7 +153,8 @@ export default function NavigatePage() {
       {buildings && buildings.results.length > 0 && (
         <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr] lg:items-start lg:gap-8">
           <aside>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              <Building2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
               Buildings
             </h2>
             <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
@@ -196,7 +202,7 @@ export default function NavigatePage() {
 
           <section className="min-w-0 space-y-6">
             {selectedBuilding && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card sm:p-6">
+              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-card sm:p-6">
                 <div className="flex flex-wrap items-center gap-2">
                   {selectedBuilding.code && (
                     <span className="rounded-md bg-brand-50 px-2 py-0.5 font-mono text-xs font-semibold text-brand-700 ring-1 ring-brand-100">
@@ -214,13 +220,12 @@ export default function NavigatePage() {
                 )}
 
                 {detailLoading ? (
-                  <div className="mt-4 rounded-xl bg-slate-50 py-6 text-center text-sm text-slate-500">
-                    Loading floor plans…
-                  </div>
+                  <FloorPlanPanelSkeleton />
                 ) : floorPlans.length > 0 ? (
                   <div className="mt-4 grid gap-4 xl:grid-cols-[190px_minmax(0,1fr)] xl:items-start">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        <Layers3 className="h-3.5 w-3.5 shrink-0" aria-hidden />
                         Floor plans
                       </p>
                       <div className="mt-2 flex gap-2 overflow-x-auto pb-1 xl:flex-col xl:overflow-visible xl:pb-0">
@@ -252,7 +257,7 @@ export default function NavigatePage() {
                       </div>
                     </div>
                     {currentFloor && (
-                      <div className="min-w-0">
+                      <div className="w-full min-w-0">
                         <PdfViewer
                           key={currentFloor.id}
                           url={currentFloor.file}
@@ -291,7 +296,7 @@ export default function NavigatePage() {
               </div>
 
               {isLoading ? (
-                <Spinner label="Loading rooms" />
+                <RoomListSkeleton />
               ) : isError ? (
                 <div className="p-4 sm:p-6">
                   <ErrorState message="Could not load rooms." />

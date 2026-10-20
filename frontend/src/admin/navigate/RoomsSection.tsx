@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ErrorState, Spinner } from '../../components/Feedback'
+import { AdminTableSkeleton } from '../../components/AdminSkeletons'
+import { ErrorState } from '../../components/Feedback'
 import { Modal } from '../../components/Modal'
+import { Skeleton, SkeletonStatus } from '../../components/Skeleton'
 import {
   createLocation,
   deleteLocation,
@@ -50,7 +52,17 @@ export function RoomsSection() {
     },
   })
 
-  if (isLoading || buildings.isLoading) return <Spinner />
+  if (isLoading || buildings.isLoading)
+    return (
+      <div>
+        <div className="flex justify-end">
+          <Skeleton className="h-9 w-32" />
+        </div>
+        <SkeletonStatus label="Loading locations" className="mt-4">
+          <AdminTableSkeleton columns={6} rows={6} />
+        </SkeletonStatus>
+      </div>
+    )
   if (isError || !data || buildings.isError || !buildings.data)
     return <ErrorState message="Could not load locations." />
 

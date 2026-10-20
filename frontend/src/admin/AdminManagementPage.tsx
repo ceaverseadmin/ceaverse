@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { PendingUsersSkeleton } from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
 import { formatDate } from '../lib/format'
 import { approveUser, fetchPendingUsers, rejectUser } from '../lib/adminServices'
 
@@ -24,7 +25,7 @@ export default function AdminManagementPage() {
     },
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <PendingUsersSkeleton />
   if (isError) return <ErrorState message="Could not load pending admin signups." />
 
   const pendingUsers = data || []
@@ -33,7 +34,8 @@ export default function AdminManagementPage() {
     <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold text-slate-900">Admin Management</h1>
       <p className="mt-1 text-slate-500">
-        Review and approve new admin account requests. All signups require super admin approval.
+        Review and approve new admin account requests. All signups require super admin
+        approval.
       </p>
 
       {pendingUsers.length === 0 ? (
@@ -69,7 +71,9 @@ export default function AdminManagementPage() {
                   </button>
                   <button
                     onClick={() => {
-                      if (window.confirm(`Reject ${user.email}? This cannot be undone.`)) {
+                      if (
+                        window.confirm(`Reject ${user.email}? This cannot be undone.`)
+                      ) {
                         rejectMutation.mutate(user.id)
                       }
                     }}

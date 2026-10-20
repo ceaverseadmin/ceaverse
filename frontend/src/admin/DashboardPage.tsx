@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Activity, LibraryBig, Map, Route, Users, type LucideIcon } from 'lucide-react'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { DashboardSkeleton } from '../components/AdminSkeletons'
+import { ErrorState } from '../components/Feedback'
 import { formatDate, titleCase } from '../lib/format'
 import { fetchDashboard } from '../lib/adminServices'
 
@@ -10,7 +11,7 @@ export default function DashboardPage() {
     queryFn: fetchDashboard,
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <DashboardSkeleton />
   if (isError || !data) return <ErrorState message="Could not load the dashboard." />
 
   const { counts } = data

@@ -2,7 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
-import { ErrorState, EmptyState, PageHeader, Spinner } from '../components/Feedback'
+import { ErrorState, EmptyState, PageHeader } from '../components/Feedback'
+import { LostFoundPageSkeleton } from '../components/PublicSkeletons'
 import { categoryLabel, formatDate, titleCase } from '../lib/format'
 import { claimLostFound, fetchLostFound } from '../lib/services'
 import type { LostFoundItem } from '../lib/types'
@@ -69,7 +70,7 @@ export default function LostFoundPage() {
         ))}
       </div>
 
-      {isLoading && <Spinner />}
+      {isLoading && <LostFoundPageSkeleton />}
       {isError && <ErrorState message="Could not load reports." />}
       {data && data.length === 0 && (
         <div className="mt-8">
