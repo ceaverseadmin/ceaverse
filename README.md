@@ -93,6 +93,49 @@ python manage.py seed --force  # wipe content and restore defaults
 Creates landing sections/service cards, 6 ebooks (with generated placeholder
 PDFs), 4 buildings with floor plans, wayfinding locations, and demo accounts.
 
+## Production deployment
+
+### Render backend
+
+Use these Render service settings:
+
+| Setting           | Value                       |
+| ----------------- | --------------------------- |
+| Root Directory    | `backend`                   |
+| Build Command     | `bash build.sh`             |
+| Start Command     | `bash start.sh`             |
+| Health Check Path | `/api/landing/content/`     |
+
+Set the super admin credentials in the Render dashboard:
+
+```env
+DJANGO_SETTINGS_MODULE=config.settings.production
+DJANGO_SUPERUSER_EMAIL=admin@example.com
+DJANGO_SUPERUSER_PASSWORD=<strong-password>
+DJANGO_SUPERUSER_FULL_NAME=Portal Administrator
+```
+
+- `DJANGO_SUPERUSER_PASSWORD` must be a **Secret**.
+- `DJANGO_SUPERUSER_EMAIL` and `DJANGO_SUPERUSER_FULL_NAME` can be Config vars.
+- `DJANGO_SETTINGS_MODULE` selects production settings for `manage.py` commands.
+- Do not add a `VITE_` prefix; these are backend-only values.
+- Keep the existing production database, secret key, Cloudinary, CORS, and CSRF
+  environment variables configured as well.
+
+`start.sh` runs `create_superadmin` on every deploy. The command is idempotent:
+it creates the account when missing, promotes an existing account when needed,
+and leaves the existing password unchanged.
+
+To reset the password manually, run this from the Render Shell:
+
+```bash
+python manage.py create_superadmin --update-password
+```
+
+> Warning: a local `backend/.env` with `DATABASE_URL` pointing to Neon writes to
+> the production database. Use Render Shell for production account changes
+> unless you intentionally want to run the command locally against Neon.
+
 ## Development checks
 
 ```bash
