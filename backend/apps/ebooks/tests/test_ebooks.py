@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 BOOKS_URL = "/api/ebooks/"
+ADMIN_BOOKS_URL = "/api/ebooks/admin/books/"
 
 PNG_1PX = bytes.fromhex(
     "89504e470d0a1a0a0000000d4948445200000001000000010806000000"
@@ -155,3 +156,116 @@ class TestAdminManagement:
         response = api_client.get(BOOKS_URL, {"category": "reference"}, **headers)
         titles = [b["title"] for b in env(response)["data"]["results"]]
         assert titles == ["Ref"]
+
+    def test_filter_by_new_category(self, api_client, admin_user):
+        headers = auth_headers(api_client, admin_user)
+        Book.objects.create(
+            title="Video", category=Book.Category.YOUTUBE,
+            url="https://www.youtube.com/watch?v=abc123",
+        )
+        response = api_client.get(BOOKS_URL, {"category": "youtube"}, **headers)
+        titles = [b["title"] for b in env(response)["data"]["results"]]
+        assert titles == ["Video"]
+
+    def test_search_by_title(self, api_client, admin_user):
+        headers = auth_headers(api_client, admin_user)
+        Book.objects.create(
+            title="Structural Analysis", category=Book.Category.SUBJECT,
+            file=SimpleUploadedFile("s.pdf", PDF_MINIMAL, content_type="application/pdf"),
+        )
+        Book.objects.create(
+            title="Circuits", category=Book.Category.MODULE,
+            file=SimpleUploadedFile("c.pdf", PDF_MINIMAL, content_type="application/pdf"),
+        )
+        response = api_client.get(BOOKS_URL, {"search": "structural"}, **headers)
+        titles = [b["title"] for b in env(response)["data"]["results"]]
+        assert titles == ["Structural Analysis"]
+
+    def test_patch_category_json(self, api_client, admin_user):
+        headers = auth_headers(api_client, admin_user)
+        book = Book.objects.create(
+            title="Movable", category=Book.Category.TEXTBOOK,
+            file=SimpleUploadedFile("m.pdf", PDF_MINIMAL, content_type="application/pdf"),
+        )
+        response = api_client.patch(
+            f"{ADMIN_BOOKS_URL}{book.id}/",
+            {"category": "research"},
+            format="json",
+            **headers,
+        )
+        assert response.status_code == status.HTTP_200_OK
+        book.refresh_from_db()
+        assert book.category == Book.Category.RESEARCH
+
+
+# ---------------------------------------------------------------------------
+# Admin catalog
+# ---------------------------------------------------------------------------
+
+class TestAdminCatalog:
+    def test_admin_sees_hidden_books(self, api_client, admin_user):
+        headers = auth_headers(api_client, admin_user)
+        Book.objects.create(
+            title="Hidden", is_active=False,
+            file=SimpleUploadedFile("h.pdf", PDF_MINIMAL, content_type="application/pdf"),
+        )
+        response = api_client.get(ADMIN_BOOKS_URL, **headers)
+        assert response.status_code == status.HTTP_200_OK
+        titles = [b["title"] for b in env(response)["data"]["results"]]
+        assert titles == ["Hidden"]
+
+    def test_anonymous_cannot_list_admin_catalog(self, api_client):
+        assert (
+            api_client.get(ADMIN_BOOKS_URL).status_code
+            == status.HTTP_401_UNAUTHORIZED
+        )
+
+    def test_officer_cannot_list_admin_catalog(self, api_client, officer):
+        headers = auth_headers(api_client, officer)
+        assert (
+            api_client.get(ADMIN_BOOKS_URL, **headers).status_code
+            == status.HTTP_403_FORBIDDEN
+        )
+
+
+# ---------------------------------------------------------------------------
+# External resources
+# ---------------------------------------------------------------------------
+
+class TestExternalResources:
+    def test_admin_can_create_url_only_resource(self, api_client, admin_user):
+        headers = auth_headers(api_client, admin_user)
+        response = api_client.post(
+            BOOKS_URL,
+            {
+                "title": "YouTube Lectures",
+                "category": "youtube",
+                "url": "https://www.youtube.com/watch?v=abc123",
+            },
+            format="json",
+            **headers,
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        data = env(response)["data"]
+        assert data["url"] == "https://www.youtube.com/watch?v=abc123"
+        assert data["file"] is None
+
+    def test_requires_file_or_url(self, api_client, admin_user):
+        headers = auth_headers(api_client, admin_user)
+        response = api_client.post(
+            BOOKS_URL,
+            {"title": "Empty", "category": "subject"},
+            format="json",
+            **headers,
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_public_catalog_exposes_url(self, api_client):
+        Book.objects.create(
+            title="Video", category=Book.Category.YOUTUBE,
+            url="https://www.youtube.com/watch?v=abc123",
+        )
+        response = api_client.get(BOOKS_URL)
+        results = env(response)["data"]["results"]
+        assert results[0]["url"] == "https://www.youtube.com/watch?v=abc123"
+        assert results[0]["file"] is None

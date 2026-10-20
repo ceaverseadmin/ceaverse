@@ -11,9 +11,8 @@ class LostFoundItemAdmin(admin.ModelAdmin):
         "category",
         "status",
         "is_public",
-        "tracking_code",
         "created_at",
     ]
     list_filter = ["item_type", "category", "status", "is_public"]
-    search_fields = ["title", "description", "tracking_code", "contact_email", "contact_name"]
-    readonly_fields = ["tracking_code", "created_at", "updated_at"]
+    search_fields = ["title", "description", "contact_email", "contact_name"]
+    readonly_fields = ["created_at", "updated_at"]

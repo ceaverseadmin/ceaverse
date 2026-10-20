@@ -21,9 +21,9 @@ export default function Footer() {
         <div>
           <p className="font-semibold text-white">CEAVERSE Web Portal</p>
           <p className="mt-2 text-sm text-white/75">
-            A joint project of Engineering and Architecture - College Student
-            Council (EA-CSC) together with Institute of Computer Engineers of the
-            Philippines. Student Edition - CatSU Chapter (ICPEP.SE CatSU)
+            A joint project of Engineering and Architecture - College Student Council
+            (EA-CSC) together with Institute of Computer Engineers of the Philippines.
+            Student Edition - CatSU Chapter (ICPEP.SE CatSU)
           </p>
           <div className="mt-4">
             <a
@@ -42,7 +42,11 @@ export default function Footer() {
               aria-label="EA-CSC on Facebook"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/75 transition hover:border-white hover:text-white"
             >
-              <img src="/eacsc.png" alt="EA-CSC Logo" className="h-7 w-7 rounded-full bg-white object-contain" />
+              <img
+                src="/eacsc.png"
+                alt="EA-CSC Logo"
+                className="h-7 w-7 rounded-full bg-white object-contain"
+              />
             </a>
             <a
               href="https://www.facebook.com/Icpep.seCatSu"
@@ -51,7 +55,11 @@ export default function Footer() {
               aria-label="ICpEP.SE CatSU Chapter on Facebook"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/75 transition hover:border-white hover:text-white"
             >
-              <img src="/icpep.png" alt="ICpEP Logo" className="h-7 w-7 object-contain" />
+              <img
+                src="/icpep.png"
+                alt="ICpEP Logo"
+                className="h-7 w-7 object-contain"
+              />
             </a>
             <div className="ml-1 flex items-center gap-2">
               <a
@@ -82,13 +90,8 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link className="hover:text-white" to="/floor-plans">
-                Floor Plans
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-white" to="/wayfinding">
-                Wayfinding
+              <Link className="hover:text-white" to="/navigate">
+                Navigate
               </Link>
             </li>
           </ul>

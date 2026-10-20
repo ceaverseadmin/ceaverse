@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Search } from 'lucide-react'
 import { ErrorState, Spinner } from '../components/Feedback'
-import { categoryLabel, formatDate } from '../lib/format'
+import { Modal } from '../components/Modal'
+import { categoryLabel } from '../lib/format'
 import {
   createBook,
   deleteBook,
@@ -10,7 +12,17 @@ import {
 } from '../lib/adminServices'
 import type { Book } from '../lib/types'
 
-const categories = ['textbook', 'module', 'reference', 'syllabus']
+const categoryColumns = [
+  { value: 'subject', label: 'Subjects' },
+  { value: 'archive', label: 'Archives' },
+  { value: 'research', label: 'Research' },
+  { value: 'youtube', label: 'Youtube Resources' },
+  { value: 'textbook', label: 'Textbooks' },
+  { value: 'module', label: 'Modules' },
+  { value: 'reference', label: 'References' },
+  { value: 'syllabus', label: 'Syllabi' },
+]
+
 const yearLevels = ['1st', '2nd', '3rd', '4th', '5th']
 const courses = ['BSCpE', 'BSCE', 'BSARCHI', 'BSECE']
 
@@ -19,11 +31,37 @@ const inputClass =
 
 export default function EbooksAdminPage() {
   const queryClient = useQueryClient()
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['admin-books'],
-    queryFn: fetchBooksAdmin,
-  })
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [yearFilter, setYearFilter] = useState('')
+  const [courseFilter, setCourseFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [page, setPage] = useState(1)
   const [editing, setEditing] = useState<Book | 'new' | null>(null)
+
+  const pageSize = 100
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: [
+      'admin-books',
+      search,
+      categoryFilter,
+      yearFilter,
+      courseFilter,
+      statusFilter,
+      page,
+    ],
+    queryFn: () =>
+      fetchBooksAdmin({
+        search: search || undefined,
+        category: categoryFilter || undefined,
+        year_level: yearFilter || undefined,
+        course: courseFilter || undefined,
+        is_active: statusFilter === '' ? undefined : statusFilter === 'true',
+        page,
+        page_size: pageSize,
+      }),
+  })
 
   const saveMutation = useMutation({
     mutationFn: ({ id, form }: { id?: string; form: FormData }) =>
@@ -42,6 +80,13 @@ export default function EbooksAdminPage() {
   if (isLoading) return <Spinner />
   if (isError || !data) return <ErrorState message="Could not load the library." />
 
+  const totalPages = Math.max(1, Math.ceil(data.count / pageSize))
+
+  const openEditor = (target: Book | 'new') => {
+    saveMutation.reset()
+    setEditing(target)
+  }
+
   return (
     <div className="p-4 sm:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -50,25 +95,108 @@ export default function EbooksAdminPage() {
           <p className="mt-1 text-slate-500">Manage the library catalog.</p>
         </div>
         <button
-          onClick={() => setEditing('new')}
+          onClick={() => openEditor('new')}
           className="rounded-md bg-brand-600 px-4 py-2 font-medium text-white hover:bg-brand-700"
         >
           Add material
         </button>
       </div>
 
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="relative">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            placeholder="Search materials…"
+            className={`${inputClass} pl-9`}
+          />
+        </div>
+        <select
+          value={categoryFilter}
+          onChange={(e) => {
+            setCategoryFilter(e.target.value)
+            setPage(1)
+          }}
+          className={inputClass}
+        >
+          <option value="">All sections</option>
+          {categoryColumns.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={yearFilter}
+          onChange={(e) => {
+            setYearFilter(e.target.value)
+            setPage(1)
+          }}
+          className={inputClass}
+        >
+          <option value="">All years</option>
+          {yearLevels.map((y) => (
+            <option key={y} value={y}>
+              {y} Year
+            </option>
+          ))}
+        </select>
+        <select
+          value={courseFilter}
+          onChange={(e) => {
+            setCourseFilter(e.target.value)
+            setPage(1)
+          }}
+          className={inputClass}
+        >
+          <option value="">All courses</option>
+          {courses.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value)
+            setPage(1)
+          }}
+          className={inputClass}
+        >
+          <option value="">Any status</option>
+          <option value="true">Active</option>
+          <option value="false">Hidden</option>
+        </select>
+      </div>
+
       {editing && (
-        <BookForm
-          book={editing === 'new' ? null : editing}
-          onCancel={() => setEditing(null)}
-          onSubmit={(form) =>
-            saveMutation.mutate({
-              id: editing === 'new' ? undefined : editing.id,
-              form,
-            })
-          }
-          error={saveMutation.isError}
-        />
+        <Modal
+          title={editing === 'new' ? 'Add material' : 'Edit material'}
+          size="xl"
+          onClose={() => setEditing(null)}
+        >
+          <BookForm
+            key={editing === 'new' ? 'new' : editing.id}
+            book={editing === 'new' ? null : editing}
+            onCancel={() => setEditing(null)}
+            onSubmit={(form) =>
+              saveMutation.mutate({
+                id: editing === 'new' ? undefined : editing.id,
+                form,
+              })
+            }
+            error={saveMutation.isError}
+          />
+        </Modal>
       )}
 
       <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -84,9 +212,7 @@ export default function EbooksAdminPage() {
               <th className="px-4 py-3 text-left font-semibold text-slate-600">
                 Category
               </th>
-              <th className="px-4 py-3 text-left font-semibold text-slate-600">
-                Year
-              </th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">Year</th>
               <th className="px-4 py-3 text-left font-semibold text-slate-600">
                 Course
               </th>
@@ -106,9 +232,7 @@ export default function EbooksAdminPage() {
                 <td className="px-4 py-3 text-slate-600">
                   {categoryLabel(book.category)}
                 </td>
-                <td className="px-4 py-3 text-slate-600">
-                  {book.year_level || '—'}
-                </td>
+                <td className="px-4 py-3 text-slate-600">{book.year_level || '—'}</td>
                 <td className="px-4 py-3 text-slate-600">{book.course || '—'}</td>
                 <td className="px-4 py-3">
                   <span
@@ -124,7 +248,7 @@ export default function EbooksAdminPage() {
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2 text-xs">
                     <button
-                      onClick={() => setEditing(book)}
+                      onClick={() => openEditor(book)}
                       className="rounded-md px-2 py-1 font-medium text-brand-600 hover:bg-brand-50"
                     >
                       Edit
@@ -145,15 +269,33 @@ export default function EbooksAdminPage() {
           </tbody>
         </table>
         {data.results.length === 0 && (
-          <p className="p-6 text-center text-slate-500">No materials yet.</p>
+          <p className="p-6 text-center text-slate-500">No materials found.</p>
         )}
       </div>
-      {data.results.length > 0 && (
-        <p className="mt-2 text-xs text-slate-400">
-          Added {formatDate(data.results[0].created_at)} · last updated{' '}
-          {formatDate(data.results[0].updated_at)}
-        </p>
-      )}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
+        <span>
+          {data.count} material{data.count === 1 ? '' : 's'}
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+            className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -179,9 +321,13 @@ function BookForm({
     pages: book?.pages?.toString() ?? '',
     order: book?.order?.toString() ?? '0',
     is_active: book?.is_active ?? true,
+    url: book?.url ?? '',
   })
   const [cover, setCover] = useState<File | null>(null)
   const [file, setFile] = useState<File | null>(null)
+
+  const isYoutube = form.category === 'youtube'
+  const fileRequired = !book && !isYoutube && !form.url.trim()
 
   const update = (key: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -189,26 +335,23 @@ function BookForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const fd = new FormData()
-    Object.entries(form).forEach(([key, value]) => fd.append(key, String(value)))
+    Object.entries(form).forEach(([key, value]) => {
+      if (key === 'pages' && value === '') return
+      fd.append(key, String(value))
+    })
     if (cover) fd.append('cover', cover)
     if (file) fd.append('file', file)
     onSubmit(fd)
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-    >
-      <h2 className="font-semibold text-slate-900">
-        {book ? 'Edit material' : 'Add material'}
-      </h2>
+    <form onSubmit={handleSubmit}>
       {error && (
-        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
-          Could not save. Check the PDF file is valid and all required fields are set.
+        <p className="mb-4 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
+          Could not save. Check the required fields and that the PDF file is valid.
         </p>
       )}
-      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         <input
           required
           placeholder="Title"
@@ -227,9 +370,9 @@ function BookForm({
           onChange={(e) => update('category', e.target.value)}
           className={inputClass}
         >
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {categoryLabel(c)}
+          {categoryColumns.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
             </option>
           ))}
         </select>
@@ -289,6 +432,16 @@ function BookForm({
             className={`${inputClass} w-full`}
           />
         </div>
+        <input
+          type="url"
+          placeholder={
+            isYoutube ? 'YouTube / external URL (required)' : 'External URL (optional)'
+          }
+          required={isYoutube}
+          value={form.url}
+          onChange={(e) => update('url', e.target.value)}
+          className={`${inputClass} sm:col-span-2`}
+        />
         <div>
           <label className="block text-sm font-medium text-slate-700">
             Cover image
@@ -300,20 +453,25 @@ function BookForm({
             className={`${inputClass} w-full`}
           />
         </div>
-        <div>
+        <div className="sm:col-span-2">
           <label className="block text-sm font-medium text-slate-700">
-            PDF file {book ? '(leave empty to keep current)' : ''}
+            PDF file{' '}
+            {isYoutube
+              ? '(optional for Youtube resources)'
+              : book
+                ? '(leave empty to keep current)'
+                : ''}
           </label>
           <input
             type="file"
             accept="application/pdf"
-            required={!book}
+            required={fileRequired}
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             className={`${inputClass} w-full`}
           />
         </div>
       </div>
-      <div className="mt-4 flex gap-3">
+      <div className="mt-6 flex gap-3">
         <button
           type="submit"
           className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"

@@ -73,24 +73,39 @@ export default function EbookDetailPage() {
             <dt className="text-slate-500">Added</dt>
             <dd className="text-slate-900">{formatDate(data.created_at)}</dd>
           </dl>
-          <a
-            href={data.file}
-            download
-            target="_blank"
-            rel="noreferrer"
-            className="mt-8 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
-          >
-            Download PDF
-          </a>
+          {data.url ? (
+            <a
+              href={data.url}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
+            >
+              Open resource
+            </a>
+          ) : (
+            data.file && (
+              <a
+                href={data.file}
+                download
+                target="_blank"
+                rel="noreferrer"
+                className="mt-8 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
+              >
+                Download PDF
+              </a>
+            )
+          )}
         </div>
       </div>
 
-      <div className="mt-12">
-        <h2 className="text-xl font-bold text-slate-900">Preview</h2>
-        <div className="mt-4">
-          <PdfPreview url={data.file} label="material" />
+      {data.file && (
+        <div className="mt-12">
+          <h2 className="text-xl font-bold text-slate-900">Preview</h2>
+          <div className="mt-4">
+            <PdfPreview url={data.file} label="material" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

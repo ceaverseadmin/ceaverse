@@ -83,10 +83,9 @@ export async function fetchPendingUsers(): Promise<AuthUser[]> {
 }
 
 export async function approveUser(userId: string): Promise<AuthUser> {
-  const { data } = await api.post<ApiEnvelope<AuthUser>>(
-    `/users/${userId}/approve/`,
-    { action: 'approve' },
-  )
+  const { data } = await api.post<ApiEnvelope<AuthUser>>(`/users/${userId}/approve/`, {
+    action: 'approve',
+  })
   return unwrap(data)
 }
 
@@ -220,29 +219,55 @@ export interface BookPayload {
   order?: number
   cover?: File | string | null
   file?: File | string | null
+  url?: string
 }
 
-export async function fetchBooksAdmin(): Promise<Paginated<Book>> {
-  const { data } = await api.get<ApiEnvelope<Paginated<Book>>>('/ebooks/')
+export async function fetchBooksAdmin(params?: {
+  category?: string
+  year_level?: string
+  course?: string
+  is_active?: boolean
+  search?: string
+  page?: number
+  page_size?: number
+}): Promise<Paginated<Book>> {
+  const queryString = new URLSearchParams()
+  if (params?.category) queryString.append('category', params.category)
+  if (params?.year_level) queryString.append('year_level', params.year_level)
+  if (params?.course) queryString.append('course', params.course)
+  if (params?.is_active !== undefined)
+    queryString.append('is_active', String(params.is_active))
+  if (params?.search) queryString.append('search', params.search)
+  if (params?.page) queryString.append('page', String(params.page))
+  if (params?.page_size) queryString.append('page_size', String(params.page_size))
+  const url = queryString.toString()
+    ? `/ebooks/admin/books/?${queryString.toString()}`
+    : '/ebooks/admin/books/'
+
+  const { data } = await api.get<ApiEnvelope<Paginated<Book>>>(url)
   return unwrap(data)
 }
 
 export async function createBook(payload: FormData): Promise<Book> {
-  const { data } = await api.post<ApiEnvelope<Book>>('/ebooks/', payload, {
+  const { data } = await api.post<ApiEnvelope<Book>>('/ebooks/admin/books/', payload, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
   return unwrap(data)
 }
 
 export async function updateBook(id: string, payload: FormData): Promise<Book> {
-  const { data } = await api.patch<ApiEnvelope<Book>>(`/ebooks/${id}/`, payload, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.patch<ApiEnvelope<Book>>(
+    `/ebooks/admin/books/${id}/`,
+    payload,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    },
+  )
   return unwrap(data)
 }
 
 export async function deleteBook(id: string): Promise<void> {
-  await api.delete(`/ebooks/${id}/`)
+  await api.delete(`/ebooks/admin/books/${id}/`)
 }
 
 // ---------------------------------------------------------------------------
@@ -251,7 +276,6 @@ export async function deleteBook(id: string): Promise<void> {
 
 export interface AdminLostFoundItem {
   id: string
-  tracking_code: string
   item_type: string
   category: string
   title: string
@@ -410,6 +434,7 @@ export async function deleteBuilding(id: string): Promise<void> {
 export async function fetchFloorPlansAdmin(): Promise<Paginated<AdminFloorPlan>> {
   const { data } = await api.get<ApiEnvelope<Paginated<AdminFloorPlan>>>(
     '/floorplans/floor-plans/',
+    { params: { page_size: 100 } },
   )
   return unwrap(data)
 }

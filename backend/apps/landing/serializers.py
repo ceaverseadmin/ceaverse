@@ -3,10 +3,9 @@
 DRF FileField/ImageField serialise to absolute URLs (using the request
 context), so file-backed models expose ready-to-use URLs without extra fields.
 """
+from common.validators import validate_image, validate_pdf
 from django.core.validators import URLValidator
 from rest_framework import serializers
-
-from common.validators import validate_image, validate_pdf
 
 from .models import (
     AboutSection,
@@ -42,6 +41,7 @@ class HeroSerializer(serializers.ModelSerializer):
         allow_null=True,
         validators=[validate_image],
     )
+    remove_image = serializers.BooleanField(write_only=True, required=False, default=False)
     cta_url = URLOrPathField(required=False, allow_blank=True)
 
     class Meta:
@@ -50,12 +50,20 @@ class HeroSerializer(serializers.ModelSerializer):
             "title",
             "subtitle",
             "background_image",
+            "remove_image",
             "cta_label",
             "cta_url",
             "is_active",
             "updated_at",
         ]
         read_only_fields = ["updated_at"]
+
+    def update(self, instance, validated_data):
+        if validated_data.pop("remove_image", False) and "background_image" not in validated_data:
+            if instance.background_image:
+                instance.background_image.delete(save=False)
+            instance.background_image = None
+        return super().update(instance, validated_data)
 
 
 class AboutSectionSerializer(serializers.ModelSerializer):
@@ -64,11 +72,19 @@ class AboutSectionSerializer(serializers.ModelSerializer):
         allow_null=True,
         validators=[validate_image],
     )
+    remove_image = serializers.BooleanField(write_only=True, required=False, default=False)
 
     class Meta:
         model = AboutSection
-        fields = ["title", "content", "image", "updated_at"]
+        fields = ["title", "content", "image", "remove_image", "updated_at"]
         read_only_fields = ["updated_at"]
+
+    def update(self, instance, validated_data):
+        if validated_data.pop("remove_image", False) and "image" not in validated_data:
+            if instance.image:
+                instance.image.delete(save=False)
+            instance.image = None
+        return super().update(instance, validated_data)
 
 
 class MissionSectionSerializer(serializers.ModelSerializer):

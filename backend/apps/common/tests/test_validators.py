@@ -75,5 +75,5 @@ class TestValidatePdf:
             _upload("big.pdf", PDF_MINIMAL, "application/pdf"),
             PDF_MAX_SIZE_MB * 1024 * 1024 + 1,
         )
-        with pytest.raises(ValidationError, match="20 MB or smaller"):
+        with pytest.raises(ValidationError, match=f"{PDF_MAX_SIZE_MB} MB or smaller"):
             validate_pdf(upload)

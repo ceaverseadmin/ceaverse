@@ -11,7 +11,12 @@ class BookSerializer(serializers.ModelSerializer):
         allow_null=True,
         validators=[validate_image],
     )
-    file = serializers.FileField(validators=[validate_pdf])
+    file = serializers.FileField(
+        required=False,
+        allow_null=True,
+        validators=[validate_pdf],
+    )
+    url = serializers.URLField(required=False, allow_blank=True)
 
     class Meta:
         model = Book
@@ -22,6 +27,7 @@ class BookSerializer(serializers.ModelSerializer):
             "description",
             "cover",
             "file",
+            "url",
             "category",
             "year_level",
             "course",
@@ -32,3 +38,11 @@ class BookSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+    def validate(self, attrs):
+        instance = self.instance
+        file = attrs.get("file", getattr(instance, "file", None))
+        url = attrs.get("url", getattr(instance, "url", ""))
+        if not file and not url:
+            raise serializers.ValidationError("Provide a PDF file or an external URL.")
+        return attrs

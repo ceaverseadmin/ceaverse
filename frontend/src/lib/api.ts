@@ -8,8 +8,10 @@ import {
   refreshAccessToken,
 } from './auth'
 
+const apiOrigin = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
+
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: apiOrigin ? `${apiOrigin}/api` : '/api',
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -26,7 +28,6 @@ const PUBLIC_API_PATHS = [
   '/auth/refresh',
   '/landing/content',
   '/lost-found/items',
-  '/lost-found/track',
   '/voice',
 ]
 
@@ -110,9 +111,11 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       !isPublicPath(error.config?.url, error.config?.method)
     ) {
-      const original = error.config as (AxiosRequestConfig & {
-        _retry?: boolean
-      }) | undefined
+      const original = error.config as
+        | (AxiosRequestConfig & {
+            _retry?: boolean
+          })
+        | undefined
       if (original && !original._retry) {
         original._retry = true
 

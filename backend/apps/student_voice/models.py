@@ -8,6 +8,7 @@ class VoiceSubmission(models.Model):
     """A student voice message awaiting moderation."""
 
     class Category(models.TextChoices):
+        CCF = "ccf", "CCF (Cea Confession File)"
         SUGGESTION = "suggestion", "Suggestion"
         COMPLIMENT = "compliment", "Compliment"
         CONCERN = "concern", "Concern"

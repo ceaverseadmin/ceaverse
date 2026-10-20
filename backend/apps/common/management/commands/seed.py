@@ -119,10 +119,10 @@ class Command(BaseCommand):
                 "title": "College of Engineering & Architecture",
                 "subtitle": (
                     "One portal for ebooks, lost & found, student voice, "
-                    "floor plans, and wayfinding."
+                    "and campus navigation."
                 ),
                 "cta_label": "Browse resources",
-                "cta_url": "/ebooks",
+                "cta_url": "/library",
                 "is_active": True,
             },
             "about": {
@@ -173,9 +173,9 @@ class Command(BaseCommand):
             for index, card in enumerate(
                 (
                     ("book", "Ebook library", "Download study materials and references."),
-                    ("search", "Lost & found", "Report and track lost items on campus."),
+                    ("search", "Lost & found", "Report lost and found items on campus."),
                     ("message-square", "Student voice", "Share feedback and shout-outs."),
-                    ("compass", "Wayfinding", "Find rooms and offices by building."),
+                    ("compass", "Navigate", "Find rooms and preview building floor plans."),
                 )
             ):
                 ServiceCard.objects.create(
@@ -280,6 +280,41 @@ class Command(BaseCommand):
                 "order": 6,
                 "slug": "electrical-circuits",
             },
+            {
+                "title": "Engineering Drawing Subject Pack",
+                "author": "CEA Faculty",
+                "description": "Compiled drawings, plates, and subject notes.",
+                "category": Book.Category.SUBJECT,
+                "pages": 142,
+                "order": 7,
+                "slug": "engineering-drawing",
+            },
+            {
+                "title": "CEA Archives: Past Capstone Projects",
+                "author": "CEA Library",
+                "description": "Archived capstone abstracts from previous batches.",
+                "category": Book.Category.ARCHIVE,
+                "pages": 210,
+                "order": 8,
+                "slug": "cea-archives",
+            },
+            {
+                "title": "Research Writing Guide",
+                "author": "Research Committee",
+                "description": "Guidelines for writing and defending research papers.",
+                "category": Book.Category.RESEARCH,
+                "pages": 54,
+                "order": 9,
+                "slug": "research-writing-guide",
+            },
+            {
+                "title": "Strength of Materials Video Lectures",
+                "author": "CEA YouTube Channel",
+                "description": "Video playlist covering stress, strain, and beam analysis.",
+                "category": Book.Category.YOUTUBE,
+                "url": "https://www.youtube.com/results?search_query=strength+of+materials+lectures",
+                "order": 10,
+            },
         ]
         for entry in catalog:
             book = Book(
@@ -287,11 +322,13 @@ class Command(BaseCommand):
                 author=entry["author"],
                 description=entry["description"],
                 category=entry["category"],
-                pages=entry["pages"],
+                url=entry.get("url", ""),
+                pages=entry.get("pages"),
                 order=entry["order"],
                 is_active=True,
             )
-            save_pdf(book.file, entry["title"], entry["slug"])
+            if entry.get("slug"):
+                save_pdf(book.file, entry["title"], entry["slug"])
             book.save()
             self.stdout.write(f"  + ebook {entry['title']}")
         self.stdout.write(f"  + ebooks ({len(catalog)})")

@@ -5,7 +5,6 @@ from .views import (
     ClaimItemView,
     LostFoundItemViewSet,
     PublicItemListView,
-    TrackItemView,
 )
 
 router = DefaultRouter()
@@ -13,7 +12,6 @@ router.register("admin/items", LostFoundItemViewSet, basename="lost-found-items"
 
 urlpatterns = [
     path("items/", PublicItemListView.as_view(), name="lost-found-items-public"),
-    path("track/<str:tracking_code>/", TrackItemView.as_view(), name="lost-found-track"),
     path(
         "items/<uuid:pk>/claim/",
         ClaimItemView.as_view(),

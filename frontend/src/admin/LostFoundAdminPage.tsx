@@ -44,7 +44,6 @@ export default function LostFoundAdminPage() {
                 Title
               </th>
               <th className="px-4 py-3 text-left font-semibold text-slate-600">Type</th>
-              <th className="px-4 py-3 text-left font-semibold text-slate-600">Code</th>
               <th className="px-4 py-3 text-left font-semibold text-slate-600">Date</th>
               <th className="px-4 py-3 text-left font-semibold text-slate-600">
                 Status
@@ -73,9 +72,6 @@ export default function LostFoundAdminPage() {
                   >
                     {titleCase(item.item_type)}
                   </span>
-                </td>
-                <td className="px-4 py-3 font-mono text-xs text-slate-500">
-                  {item.tracking_code}
                 </td>
                 <td className="px-4 py-3 text-slate-500">{formatDate(item.date)}</td>
                 <td className="px-4 py-3">

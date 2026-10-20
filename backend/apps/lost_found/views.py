@@ -1,12 +1,11 @@
 """Lost & Found views.
 
-Public visitors submit reports and look them up by tracking code (rate
-limited); administrators manage items and their status.
+Public visitors submit reports and browse the public list (rate limited);
+administrators manage items and their status.
 """
 from accounts.audit import log_action
 from accounts.models import ActivityLog
 from accounts.permissions import IsAdminOrHigher
-from django.db import IntegrityError
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
@@ -19,7 +18,6 @@ from .serializers import (
     AdminItemSerializer,
     PublicCreateSerializer,
     PublicItemSerializer,
-    TrackItemSerializer,
 )
 
 
@@ -61,61 +59,18 @@ class PublicItemListView(APIView):
     def post(self, request):
         serializer = PublicCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        try:
-            item = serializer.save()
-        except IntegrityError:
-            return Response(
-                {
-                    "success": False,
-                    "message": "Could not generate a tracking code. Try again.",
-                    "data": None,
-                    "errors": None,
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+        item = serializer.save()
         return Response(
             {
                 "success": True,
                 "message": (
-                    "Report received. Keep your tracking code to check the "
-                    "status of your report."
+                    "Report received. It is now visible in the Lost & Found "
+                    "list."
                 ),
                 "data": PublicCreateSerializer(item).data,
                 "errors": None,
             },
             status=status.HTTP_201_CREATED,
-        )
-
-
-class TrackItemView(APIView):
-    """Public lookup of a report by tracking code."""
-
-    permission_classes = (AllowAny,)
-    throttle_classes = (ScopedRateThrottle,)
-    throttle_scope = "submit"
-
-    def get(self, request, tracking_code):
-        item = LostFoundItem.objects.filter(
-            tracking_code=tracking_code.upper()
-        ).first()
-        if item is None:
-            return Response(
-                {
-                    "success": False,
-                    "message": "No report found for that tracking code.",
-                    "data": None,
-                    "errors": None,
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        serializer = TrackItemSerializer(item)
-        return Response(
-            {
-                "success": True,
-                "message": None,
-                "data": serializer.data,
-                "errors": None,
-            }
         )
 
 
@@ -172,7 +127,7 @@ class LostFoundItemViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrHigher,)
     http_method_names = ["get", "post", "patch", "delete"]
     filterset_fields = ["item_type", "category", "status", "is_public"]
-    search_fields = ["title", "description", "tracking_code", "contact_email", "contact_name"]
+    search_fields = ["title", "description", "contact_email", "contact_name"]
     ordering_fields = ["created_at", "updated_at"]
     ordering = ["-created_at"]
 

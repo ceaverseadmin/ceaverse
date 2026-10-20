@@ -9,7 +9,8 @@ import {
   Target,
   type LucideIcon,
 } from 'lucide-react'
-import Icon from '../components/Icon'
+import { HeroPreview } from '../components/HeroPreview'
+import { LogoMarquee } from '../components/LogoMarquee'
 import { ErrorState, Spinner } from '../components/Feedback'
 import { fetchLandingContent } from '../lib/services'
 
@@ -69,12 +70,28 @@ export default function HomePage() {
   if (isError || !data)
     return <ErrorState message="Could not load the portal content." />
 
-  const { hero, about, mission, vision, service_cards, downloadable_links } = data
+  const { hero, about, mission, vision, downloadable_links } = data
+
+  const ctaLabel = hero.cta_label || 'Browse the library'
+  const ctaHref =
+    !hero.cta_url || hero.cta_url === '/ebooks' ? '/library' : hero.cta_url
+  const ctaIsInternal = ctaHref.startsWith('/')
 
   return (
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-950 text-white">
+        {hero.background_image && (
+          <>
+            <img
+              src={hero.background_image}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div aria-hidden className="absolute inset-0 bg-brand-950/85" />
+          </>
+        )}
         <div
           aria-hidden
           className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"
@@ -84,63 +101,73 @@ export default function HomePage() {
           className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-brand-500/20 blur-3xl"
         />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.07),transparent_60%)]" />
-        <div className="relative mx-auto max-w-6xl px-4 py-24 md:py-32">
-          <p className="inline-flex items-center gap-2 rounded-full border border-brand-600/40 bg-brand-900/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-brand-200">
-            <span className="relative flex h-2 w-2" aria-hidden>
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
-            </span>
-            Engineering &amp; Architecture Student Council
-          </p>
-          <h1 className="mt-6 max-w-3xl text-4xl font-bold leading-tight tracking-tight text-white md:text-6xl">
-            {hero.title || 'The CEAVERSE Web Portal'}
-          </h1>
-          {hero.subtitle && (
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-brand-100/90">
-              {hero.subtitle}
+
+        <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-20 md:py-24 lg:grid-cols-2 lg:gap-16 lg:py-28">
+          <div className="max-w-xl">
+            <p className="inline-flex items-center gap-2 rounded-full border border-brand-600/40 bg-brand-900/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-brand-200">
+              <span className="relative flex h-2 w-2" aria-hidden>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
+              </span>
+              Engineering &amp; Architecture Student Council
             </p>
-          )}
-          {hero.cta_label && (
-            <a
-              href={hero.cta_url || '#'}
-              className="group mt-9 inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-brand-900 shadow-lg shadow-black/20 transition hover:bg-brand-50"
-            >
-              {hero.cta_label}
-              <ArrowRight
-                className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                aria-hidden
-              />
-            </a>
-          )}
+            <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-white md:text-5xl">
+              {hero.title || 'The CEAVERSE Web Portal'}
+            </h1>
+            {hero.subtitle && (
+              <p className="mt-5 text-lg leading-relaxed text-brand-100/90">
+                {hero.subtitle}
+              </p>
+            )}
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              {ctaIsInternal ? (
+                <Link
+                  to={ctaHref}
+                  className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-brand-900 shadow-lg shadow-black/20 transition hover:bg-brand-50"
+                >
+                  {ctaLabel}
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    aria-hidden
+                  />
+                </Link>
+              ) : (
+                <a
+                  href={ctaHref}
+                  className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-brand-900 shadow-lg shadow-black/20 transition hover:bg-brand-50"
+                >
+                  {ctaLabel}
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    aria-hidden
+                  />
+                </a>
+              )}
+              <Link
+                to="/lost-found"
+                className="inline-flex items-center justify-center rounded-xl border border-white/25 px-7 py-3.5 font-semibold text-white transition hover:bg-white/10"
+              >
+                Report an item
+              </Link>
+            </div>
+            <p className="mt-10 text-xs font-semibold uppercase tracking-[0.18em] text-brand-200/75">
+              Ebooks · Lost &amp; Found · Navigate · Student Voice
+            </p>
+          </div>
+
+          <HeroPreview />
         </div>
       </section>
 
-      {/* Service cards */}
-      {service_cards.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-16 md:py-20">
-          <SectionHeading eyebrow="Services" title="What we offer" />
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {service_cards.map((card) => (
-              <div
-                key={card.id}
-                className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-card-hover"
-              >
-                {card.icon && (
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 ring-1 ring-brand-100 transition group-hover:bg-brand-600 group-hover:text-white">
-                    <Icon name={card.icon} size={24} />
-                  </div>
-                )}
-                <h3 className="font-semibold text-slate-900">{card.title}</h3>
-                {card.description && (
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    {card.description}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Sub-organizations and partners */}
+      <section className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+        <SectionHeading
+          eyebrow="Community"
+          title="Sub-organizations and Partners"
+          align="center"
+        />
+        <LogoMarquee />
+      </section>
 
       {/* About / Mission / Vision */}
       <section className="border-y border-slate-200 bg-white">

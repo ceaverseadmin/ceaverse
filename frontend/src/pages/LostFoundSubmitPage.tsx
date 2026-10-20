@@ -1,9 +1,9 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { X } from 'lucide-react'
 import { ErrorState, PageHeader } from '../components/Feedback'
 import { submitLostFound } from '../lib/services'
-import type { LostFoundSubmission } from '../lib/types'
 
 const categories = [
   { value: 'id_card', label: 'ID Card' },
@@ -14,30 +14,43 @@ const categories = [
   { value: 'other', label: 'Other' },
 ]
 
+const initialForm = {
+  item_type: 'lost',
+  category: 'id_card',
+  title: '',
+  description: '',
+  location: '',
+  date: '',
+  contact_name: '',
+  contact_email: '',
+}
+
 const inputClass =
   'mt-1 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
 
 export default function LostFoundSubmitPage() {
-  const [form, setForm] = useState({
-    item_type: 'lost',
-    category: 'id_card',
-    title: '',
-    description: '',
-    location: '',
-    date: '',
-    contact_name: '',
-    contact_email: '',
-  })
+  const [form, setForm] = useState(initialForm)
   const [image, setImage] = useState<File | null>(null)
-  const [result, setResult] = useState<LostFoundSubmission | null>(null)
+  const [submitted, setSubmitted] = useState(false)
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationFn: submitLostFound,
-    onSuccess: (data) => setResult(data),
+    onSuccess: () => {
+      setSubmitted(true)
+      queryClient.invalidateQueries({ queryKey: ['lost-found'] })
+    },
   })
 
   const update = (field: string, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }))
+
+  const resetForm = () => {
+    setForm(initialForm)
+    setImage(null)
+    setSubmitted(false)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,49 +58,6 @@ export default function LostFoundSubmitPage() {
     Object.entries(form).forEach(([key, value]) => payload.append(key, value))
     if (image) payload.append('image', image)
     mutation.mutate(payload)
-  }
-
-  if (result) {
-    return (
-      <div className="mx-auto max-w-xl px-4 py-16">
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-card sm:p-8">
-          <h1 className="text-xl font-bold text-emerald-900">Report received!</h1>
-          <p className="mt-2 text-emerald-800">
-            Save your tracking code to check the status of your report.
-          </p>
-          <p className="mt-4 rounded-xl bg-white px-4 py-3 text-center font-mono text-lg font-bold tracking-wider text-brand-700 shadow-sm">
-            {result.tracking_code}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              to={`/lost-found/track?code=${result.tracking_code}`}
-              className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
-            >
-              Check status
-            </Link>
-            <button
-              onClick={() => {
-                setResult(null)
-                setForm({
-                  item_type: 'lost',
-                  category: 'id_card',
-                  title: '',
-                  description: '',
-                  location: '',
-                  date: '',
-                  contact_name: '',
-                  contact_email: '',
-                })
-                setImage(null)
-              }}
-              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-            >
-              Report another
-            </button>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -233,6 +203,48 @@ export default function LostFoundSubmitPage() {
           {mutation.isPending ? 'Submitting…' : 'Submit report'}
         </button>
       </form>
+
+      {submitted && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+          onClick={resetForm}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-soft sm:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-end">
+              <button
+                onClick={resetForm}
+                aria-label="Close"
+                className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <h2 className="text-xl font-bold text-emerald-900">Report received!</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Your item is now visible in the Lost &amp; Found list.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <button
+                onClick={() => navigate('/lost-found')}
+                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
+              >
+                View in Lost &amp; Found
+              </button>
+              <button
+                onClick={resetForm}
+                className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                Report another
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

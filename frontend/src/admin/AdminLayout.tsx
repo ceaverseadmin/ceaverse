@@ -9,7 +9,6 @@ import {
   Map,
   Menu,
   MessageSquareText,
-  Route,
   Search,
   ShieldCheck,
   UserCircle2,
@@ -25,8 +24,7 @@ const links = [
   { to: '/admin/lost-found', label: 'Lost & Found', icon: Search },
   { to: '/admin/voice', label: 'Student Voice', icon: MessageSquareText },
   { to: '/admin/content', label: 'Site Content', icon: FileText },
-  { to: '/admin/floor-plans', label: 'Floor Plans', icon: Map },
-  { to: '/admin/wayfinding', label: 'Wayfinding', icon: Route },
+  { to: '/admin/navigate', label: 'Navigate', icon: Map },
   { to: '/admin/admin', label: 'Admin Management', superOnly: true, icon: ShieldCheck },
   { to: '/admin/users', label: 'Users', superOnly: true, icon: Users },
   {

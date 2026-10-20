@@ -37,3 +37,14 @@ class MediaAutoCloudinaryStorage(MediaCloudinaryStorage):
         if extension in IMAGE_EXTENSIONS:
             return RESOURCE_TYPES["IMAGE"]
         return RESOURCE_TYPES["RAW"]
+
+    def _prepend_prefix(self, name: str) -> str:
+        """Keep legacy ``media/`` uploads readable after adding a folder prefix.
+
+        Existing Cloudinary public IDs already include the old ``media/``
+        prefix. New uploads omit it, so only those get the configured folder.
+        """
+        name = name.replace("\\", "/")
+        if name.startswith("media/"):
+            return name
+        return super()._prepend_prefix(name)

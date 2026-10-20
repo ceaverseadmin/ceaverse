@@ -6,8 +6,7 @@ const links = [
   { to: '/library', label: 'Library' },
   { to: '/lost-found', label: 'Lost & Found' },
   { to: '/voice', label: 'Student Voice' },
-  { to: '/floor-plans', label: 'Floor Plans' },
-  { to: '/wayfinding', label: 'Wayfinding' },
+  { to: '/navigate', label: 'Navigate' },
 ]
 
 export default function Navbar() {

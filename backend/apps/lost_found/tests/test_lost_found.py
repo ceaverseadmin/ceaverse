@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 ITEMS_URL = "/api/lost-found/items/"
-TRACK_URL = "/api/lost-found/track/{code}/"
 ADMIN_ITEMS_URL = "/api/lost-found/admin/items/"
 
 LOGIN_URL = "/api/auth/login/"
@@ -67,7 +66,7 @@ class TestPublicSubmission:
         assert response.status_code == status.HTTP_201_CREATED
         payload = env(response)
         assert payload["success"] is True
-        assert payload["data"]["tracking_code"].startswith("LF-")
+        assert payload["data"]["title"] == "Brown wallet near the canteen"
         assert LostFoundItem.objects.count() == 1
 
     def test_submit_requires_item_type(self, api_client):
@@ -93,7 +92,7 @@ class TestPublicSubmission:
 
 
 # ---------------------------------------------------------------------------
-# Public list & tracking
+# Public list & claim
 # ---------------------------------------------------------------------------
 
 class TestPublicLookup:
@@ -103,8 +102,13 @@ class TestPublicLookup:
         assert response.status_code == status.HTTP_200_OK
         data = env(response)["data"]
         assert len(data) == 1
-        assert "contact_email" not in data[0]
-        assert "tracking_code" not in data[0]
+
+    def test_list_exposes_contact_details(self, api_client):
+        LostFoundItem.objects.create(**submit_payload())
+        response = api_client.get(ITEMS_URL)
+        data = env(response)["data"]
+        assert data[0]["contact_name"] == "Jane"
+        assert data[0]["contact_email"] == "jane@example.com"
 
     def test_list_hides_private_and_closed(self, api_client):
         LostFoundItem.objects.create(**submit_payload())
@@ -158,18 +162,6 @@ class TestPublicLookup:
         response = api_client.get(ITEMS_URL, {"item_type": "lost"})
         titles = [item["title"] for item in env(response)["data"]]
         assert titles == ["Lost calculator"]
-
-    def test_track_returns_contact_details(self, api_client):
-        item = LostFoundItem.objects.create(**submit_payload())
-        response = api_client.get(TRACK_URL.format(code=item.tracking_code))
-        assert response.status_code == status.HTTP_200_OK
-        data = env(response)["data"]
-        assert data["tracking_code"] == item.tracking_code
-        assert data["contact_email"] == "jane@example.com"
-
-    def test_track_unknown_code_404(self, api_client):
-        response = api_client.get(TRACK_URL.format(code="LF-UNKNOWN"))
-        assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 # ---------------------------------------------------------------------------

@@ -5,9 +5,13 @@ from django.db import models
 
 
 class Book(models.Model):
-    """A downloadable study material (PDF) with an optional cover image."""
+    """A study material (PDF file and/or external URL) with an optional cover image."""
 
     class Category(models.TextChoices):
+        SUBJECT = "subject", "Subject"
+        ARCHIVE = "archive", "Archive"
+        RESEARCH = "research", "Research"
+        YOUTUBE = "youtube", "Youtube Resource"
         TEXTBOOK = "textbook", "Textbook"
         MODULE = "module", "Module"
         REFERENCE = "reference", "Reference"
@@ -37,8 +41,11 @@ class Book(models.Model):
     )
     file = models.FileField(
         upload_to=UploadToPath("ebooks/files"),
+        blank=True,
+        null=True,
         validators=[validate_pdf],
     )
+    url = models.URLField(max_length=500, blank=True, default="")
     category = models.CharField(
         max_length=20, choices=Category.choices, default=Category.TEXTBOOK
     )

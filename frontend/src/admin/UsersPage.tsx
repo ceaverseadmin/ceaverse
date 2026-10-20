@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { ErrorState, Spinner } from '../components/Feedback'
+import { Modal } from '../components/Modal'
+import type { AuthUser } from '../lib/auth'
 import { formatDate, titleCase } from '../lib/format'
 import {
   createUser,
@@ -11,6 +13,9 @@ import {
   updateUser,
 } from '../lib/adminServices'
 import type { UserPayload } from '../lib/adminServices'
+
+const inputClass =
+  'rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
 
 const roles = [
   { value: 'super_admin', label: 'Super Admin' },
@@ -25,6 +30,7 @@ export default function UsersPage() {
     queryFn: fetchUsers,
   })
   const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<AuthUser | null>(null)
   const [message, setMessage] = useState<string | null>(null)
 
   const mutation = useMutation({
@@ -54,12 +60,6 @@ export default function UsersPage() {
     },
   })
 
-  const resetMutation = useMutation({
-    mutationFn: ({ id, password }: { id: string; password: string }) =>
-      resetPassword(id, password),
-    onSuccess: () => setMessage('Password reset.'),
-  })
-
   if (isLoading) return <Spinner />
   if (isError || !data) return <ErrorState message="Could not load users." />
 
@@ -85,6 +85,20 @@ export default function UsersPage() {
       )}
 
       {showForm && <UserForm onSubmit={mutation.mutate} error={mutation.isError} />}
+
+      {editing && (
+        <Modal title="Edit user" onClose={() => setEditing(null)}>
+          <EditUserForm
+            key={editing.id}
+            user={editing}
+            onCancel={() => setEditing(null)}
+            onSaved={() => {
+              setEditing(null)
+              setMessage('User updated.')
+            }}
+          />
+        </Modal>
+      )}
 
       <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
@@ -121,21 +135,18 @@ export default function UsersPage() {
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2 text-xs">
                     <button
+                      onClick={() => setEditing(user)}
+                      className="rounded-md px-2 py-1 font-medium text-brand-600 hover:bg-brand-50"
+                    >
+                      Edit
+                    </button>
+                    <button
                       onClick={() =>
                         toggleActive.mutate({ id: user.id, is_active: !user.is_active })
                       }
                       className="rounded-md px-2 py-1 font-medium text-slate-600 hover:bg-slate-100"
                     >
                       {user.is_active ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        const password = window.prompt('New password for this user:')
-                        if (password) resetMutation.mutate({ id: user.id, password })
-                      }}
-                      className="rounded-md px-2 py-1 font-medium text-brand-600 hover:bg-brand-50"
-                    >
-                      Reset password
                     </button>
                     <button
                       onClick={() => {
@@ -221,7 +232,11 @@ function UserForm({
             onClick={() => setShowPassword((v) => !v)}
             className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </button>
         </div>
         <select
@@ -242,6 +257,153 @@ function UserForm({
       >
         Create user
       </button>
+    </form>
+  )
+}
+
+function EditUserForm({
+  user,
+  onCancel,
+  onSaved,
+}: {
+  user: AuthUser
+  onCancel: () => void
+  onSaved: () => void
+}) {
+  const queryClient = useQueryClient()
+  const [form, setForm] = useState({
+    full_name: user.full_name,
+    email: user.email,
+    role: user.role,
+    is_active: user.is_active,
+    password: '',
+  })
+  const [showPassword, setShowPassword] = useState(false)
+
+  const mutation = useMutation({
+    mutationFn: async (payload: typeof form) => {
+      const { password, ...details } = payload
+      const updated = await updateUser(user.id, details)
+      if (password) await resetPassword(user.id, password)
+      return updated
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      onSaved()
+    },
+  })
+
+  const update = (key: string, value: string | boolean) =>
+    setForm((prev) => ({ ...prev, [key]: value }))
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        mutation.mutate(form)
+      }}
+    >
+      {mutation.isError && (
+        <p className="mb-4 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
+          Could not update the user. Check the email is unique and the password meets
+          the requirements.
+        </p>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            Full name
+          </label>
+          <input
+            required
+            placeholder="Full name"
+            value={form.full_name}
+            onChange={(e) => update('full_name', e.target.value)}
+            className={`${inputClass} w-full`}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Email</label>
+          <input
+            required
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => update('email', e.target.value)}
+            className={`${inputClass} w-full`}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Role</label>
+          <select
+            value={form.role}
+            onChange={(e) => update('role', e.target.value)}
+            className={`${inputClass} w-full`}
+          >
+            {roles.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <label className="flex items-center gap-2 text-sm text-slate-700 sm:mt-6">
+          <input
+            type="checkbox"
+            checked={form.is_active}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, is_active: e.target.checked }))
+            }
+            className="h-4 w-4 accent-brand-600"
+          />
+          Active account
+        </label>
+        <div className="sm:col-span-2">
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            New password
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Leave blank to keep the current password"
+              value={form.password}
+              onChange={(e) => update('password', e.target.value)}
+              className={`${inputClass} w-full pr-10`}
+            />
+            <button
+              type="button"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            Filled in? The password is reset when you save.
+          </p>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button
+          type="submit"
+          disabled={mutation.isPending}
+          className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+        >
+          Save changes
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   )
 }

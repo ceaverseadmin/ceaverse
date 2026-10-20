@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
+import { signup } from '../lib/auth'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -20,29 +21,13 @@ export default function SignupPage() {
     setSubmitting(true)
 
     try {
-      const response = await fetch('/api/auth/signup/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          full_name: fullName,
-          password,
-          password_confirm: passwordConfirm,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setSuccess(true)
-        setTimeout(() => {
-          navigate('/admin/login')
-        }, 3000)
-      } else {
-        setError(data.message || 'Could not create account')
-      }
-    } catch {
-      setError('Network error. Please try again.')
+      await signup(email, fullName, password, passwordConfirm)
+      setSuccess(true)
+      setTimeout(() => {
+        navigate('/admin/login')
+      }, 3000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not create account')
     } finally {
       setSubmitting(false)
     }
@@ -54,15 +39,15 @@ export default function SignupPage() {
         <div className="w-full max-w-sm">
           <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
             <div className="mb-6 text-center">
-              <img 
-                src="/cea-logo.png" 
-                alt="CEAVERSE Logo" 
+              <img
+                src="/cea-logo.png"
+                alt="CEAVERSE Logo"
                 className="mx-auto mb-4 h-12 w-12 rounded-lg"
               />
               <h1 className="text-lg font-bold text-slate-900">Account Created!</h1>
               <p className="mt-2 text-sm text-slate-600">
-                Your account has been created and is pending approval from a super admin.
-                You will be redirected to the login page shortly.
+                Your account has been created and is pending approval from a super
+                admin. You will be redirected to the login page shortly.
               </p>
             </div>
             <Link
@@ -82,9 +67,9 @@ export default function SignupPage() {
       <div className="w-full max-w-sm">
         <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
-            <img 
-              src="/cea-logo.png" 
-              alt="CEAVERSE Logo" 
+            <img
+              src="/cea-logo.png"
+              alt="CEAVERSE Logo"
               className="h-10 w-10 rounded-lg"
             />
             <div>
@@ -99,7 +84,9 @@ export default function SignupPage() {
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700">Full Name</label>
+              <label className="block text-sm font-medium text-slate-700">
+                Full Name
+              </label>
               <input
                 type="text"
                 required
@@ -119,7 +106,9 @@ export default function SignupPage() {
               />
             </div>
             <div className="relative">
-              <label className="block text-sm font-medium text-slate-700">Password</label>
+              <label className="block text-sm font-medium text-slate-700">
+                Password
+              </label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
@@ -133,7 +122,11 @@ export default function SignupPage() {
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
             <div className="relative">
@@ -153,7 +146,11 @@ export default function SignupPage() {
                 onClick={() => setShowConfirm((v) => !v)}
                 className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
               >
-                {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showConfirm ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
             <button
@@ -166,7 +163,10 @@ export default function SignupPage() {
           </form>
           <p className="mt-4 text-center text-sm text-slate-600">
             Already have an account?{' '}
-            <Link to="/admin/login" className="font-medium text-brand-600 hover:text-brand-700">
+            <Link
+              to="/admin/login"
+              className="font-medium text-brand-600 hover:text-brand-700"
+            >
               Sign in
             </Link>
           </p>

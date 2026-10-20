@@ -17,3 +17,27 @@ def test_pdf_maps_to_raw():
 def test_unknown_extension_maps_to_raw():
     assert storage._get_resource_type("files/archive.zip") == "raw"
     assert storage._get_resource_type("files/noextension") == "raw"
+
+
+def test_new_uploads_use_configured_folder(monkeypatch):
+    monkeypatch.setattr(storage, "_get_prefix", lambda: "ea-csc-web-portal/")
+    assert (
+        storage._prepend_prefix("ebooks/files/abc.pdf")
+        == "ea-csc-web-portal/ebooks/files/abc.pdf"
+    )
+
+
+def test_legacy_media_paths_are_preserved(monkeypatch):
+    monkeypatch.setattr(storage, "_get_prefix", lambda: "ea-csc-web-portal/")
+    assert (
+        storage._prepend_prefix("media/ebooks/files/abc.pdf")
+        == "media/ebooks/files/abc.pdf"
+    )
+
+
+def test_backslash_paths_are_normalized(monkeypatch):
+    monkeypatch.setattr(storage, "_get_prefix", lambda: "ea-csc-web-portal/")
+    assert (
+        storage._prepend_prefix(r"media\ebooks\files\abc.pdf")
+        == "media/ebooks/files/abc.pdf"
+    )

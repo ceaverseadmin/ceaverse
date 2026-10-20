@@ -6,6 +6,7 @@ import { categoryLabel, formatDate } from '../lib/format'
 import { fetchVoiceWall, submitVoice } from '../lib/services'
 
 const categories = [
+  { value: 'ccf', label: 'CCF (Cea Confession File)' },
   { value: 'suggestion', label: 'Suggestion' },
   { value: 'compliment', label: 'Compliment' },
   { value: 'concern', label: 'Concern' },
@@ -13,6 +14,7 @@ const categories = [
 ]
 
 const categoryColors: Record<string, string> = {
+  ccf: 'bg-rose-100 text-rose-700',
   suggestion: 'bg-brand-100 text-brand-700',
   compliment: 'bg-emerald-100 text-emerald-700',
   concern: 'bg-amber-100 text-amber-700',

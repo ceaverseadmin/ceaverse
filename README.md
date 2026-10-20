@@ -6,10 +6,9 @@ resources, student services, campus navigation, and organization information.
 ## Features
 
 - **Ebooks** — downloadable PDF study materials with in-browser preview
-- **Lost & found** — report items and track them with a public tracking code
+- **Lost & found** — report lost and found items and browse the public list
 - **Student voice** — moderated public message wall
-- **Floor plans** — PDF floor-plan directory by building
-- **Wayfinding** — searchable room/office directory
+- **Navigate** — searchable room/office directory with PDF floor-plan previews
 - **Admin dashboard** — manage content and users at `/admin`
 
 ## Stack

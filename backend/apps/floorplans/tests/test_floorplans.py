@@ -128,6 +128,24 @@ class TestFloorPlans:
         assert data["floor_label"] == "1st Floor"
         assert re.search(r"/media/floorplans/floors/[0-9a-f]{32}\.pdf$", data["file"])
 
+    def test_admin_can_update_floor_plan(self, api_client, admin_user):
+        headers = auth_headers(api_client, admin_user)
+        building = Building.objects.create(**make_building())
+        plan = FloorPlan.objects.create(building=building, floor_label="GF", file=pdf())
+
+        response = api_client.patch(
+            f"{FLOOR_PLANS_URL}{plan.id}/",
+            {"floor_label": "Ground Floor", "order": 2, "is_active": False},
+            format="multipart",
+            **headers,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        plan.refresh_from_db()
+        assert plan.floor_label == "Ground Floor"
+        assert plan.order == 2
+        assert plan.is_active is False
+
     def test_duplicate_floor_rejected(self, api_client, admin_user):
         headers = auth_headers(api_client, admin_user)
         building = Building.objects.create(**make_building())

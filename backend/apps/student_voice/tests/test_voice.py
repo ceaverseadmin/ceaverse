@@ -69,7 +69,22 @@ class TestPublicSubmission:
         api_client.post(WALL_URL, submit_payload(name="Maria"), format="json")
         assert VoiceSubmission.objects.get().display_name == "Maria"
 
-    def test_submission_rate_limited(self, api_client):
+    def test_ccf_submission_accepted(self, api_client):
+        response = api_client.post(
+            WALL_URL, submit_payload(category="ccf", content="I secretly love the canteen."), format="json"
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        assert env(response)["data"]["category"] == "ccf"
+
+    def test_invalid_category_rejected(self, api_client):
+        response = api_client.post(WALL_URL, submit_payload(category="gossip"), format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert VoiceSubmission.objects.count() == 0
+
+    def test_submission_rate_limited(self, api_client, monkeypatch):
+        from rest_framework.throttling import ScopedRateThrottle
+
+        monkeypatch.setattr(ScopedRateThrottle, "get_rate", lambda self: "10/hour")
         for _ in range(10):
             api_client.post(WALL_URL, submit_payload(), format="json")
         response = api_client.post(WALL_URL, submit_payload(), format="json")
@@ -104,6 +119,16 @@ class TestPublicWall:
         response = api_client.get(WALL_URL, {"category": "concern"})
         contents = [m["content"] for m in env(response)["data"]]
         assert contents == ["Noise"]
+
+    def test_wall_filters_by_ccf_category(self, api_client):
+        VoiceSubmission.objects.create(**submit_payload(), status=VoiceSubmission.Status.PUBLISHED)
+        VoiceSubmission.objects.create(
+            **submit_payload(category="ccf", content="Confession"),
+            status=VoiceSubmission.Status.PUBLISHED,
+        )
+        response = api_client.get(WALL_URL, {"category": "ccf"})
+        contents = [m["content"] for m in env(response)["data"]]
+        assert contents == ["Confession"]
 
 
 # ---------------------------------------------------------------------------

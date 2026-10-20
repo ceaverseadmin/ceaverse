@@ -1,9 +1,10 @@
 """Ebook views.
 
 Public visitors can browse the active catalog; only staff roles can manage
-books. The queryset automatically hides inactive books from the public.
+books. The queryset automatically hides inactive books from the public, while
+the admin endpoint exposes the full catalog.
 """
-from accounts.permissions import IsAdminOrReadOnly
+from accounts.permissions import IsAdminOrHigher, IsAdminOrReadOnly
 from rest_framework import viewsets
 
 from .models import Book
@@ -26,3 +27,16 @@ class BookViewSet(viewsets.ModelViewSet):
         if not (user and user.is_authenticated and user.is_administrator):
             queryset = queryset.filter(is_active=True)
         return queryset
+
+
+class BookAdminViewSet(viewsets.ModelViewSet):
+    """Full catalog for administrators, including hidden books."""
+
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = (IsAdminOrHigher,)
+    http_method_names = ["get", "post", "patch", "delete"]
+    filterset_fields = ["category", "year_level", "course", "is_active"]
+    search_fields = ["title", "author", "description"]
+    ordering_fields = ["order", "created_at", "title"]
+    ordering = ["order", "-created_at"]

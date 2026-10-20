@@ -1,4 +1,4 @@
-"""Lost & Found module — public reports with tracking codes."""
+"""Lost & Found module — public reports of lost and found items."""
 import secrets
 import string
 import uuid
@@ -9,6 +9,11 @@ from django.db import models
 
 
 def _generate_tracking_code():
+    """DEPRECATED: no longer used by the model.
+
+    Kept only because historical migration ``0001_initial`` references
+    ``lost_found.models._generate_tracking_code`` when it is loaded.
+    """
     suffix = "".join(
         secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8)
     )
@@ -16,7 +21,7 @@ def _generate_tracking_code():
 
 
 class LostFoundItem(models.Model):
-    """A reported lost or found item, trackable via a unique code."""
+    """A reported lost or found item."""
 
     class ItemType(models.TextChoices):
         LOST = "lost", "Lost"
@@ -57,9 +62,6 @@ class LostFoundItem(models.Model):
         max_length=10, choices=Status.choices, default=Status.OPEN
     )
     claimed_at = models.DateTimeField(null=True, blank=True)
-    tracking_code = models.CharField(
-        max_length=12, unique=True, default=_generate_tracking_code, editable=False
-    )
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

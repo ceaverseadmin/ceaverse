@@ -7,6 +7,10 @@ import { fetchBooks } from '../lib/services'
 
 const categories = [
   { value: '', label: 'All' },
+  { value: 'subject', label: 'Subjects' },
+  { value: 'archive', label: 'Archives' },
+  { value: 'research', label: 'Research' },
+  { value: 'youtube', label: 'Youtube Resources' },
   { value: 'textbook', label: 'Textbooks' },
   { value: 'module', label: 'Modules' },
   { value: 'reference', label: 'References' },
@@ -64,68 +68,52 @@ export default function EbooksPage() {
         subtitle="Free reference materials, modules, and syllabi for EA students."
       />
 
-      <div className="mt-6 flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex flex-wrap gap-2">
-            {categories.map((c) => (
-              <button
-                key={c.value}
-                onClick={() => setParam('category', c.value)}
-                className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition ${
-                  category === c.value
-                    ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
-                    : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setParam('search', e.target.value)}
-              placeholder="Search materials…"
-              className="rounded-xl border border-slate-300 py-2 pr-3 pl-9 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          {yearLevels.map((y) => (
-            <button
-              key={y.value}
-              onClick={() => setParam('year_level', y.value)}
-              className={`whitespace-nowrap rounded-full px-3 py-1.5 font-medium transition ${
-                yearLevel === y.value
-                  ? 'bg-slate-900 text-white shadow-sm shadow-slate-900/20'
-                  : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              {y.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          {courses.map((c) => (
-            <button
-              key={c.value}
-              onClick={() => setParam('course', c.value)}
-              className={`whitespace-nowrap rounded-full px-3 py-1.5 font-medium transition ${
-                course === c.value
-                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
-                  : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
-              }`}
-            >
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <select
+          value={category}
+          onChange={(e) => setParam('category', e.target.value)}
+          className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+        >
+          {categories.map((c) => (
+            <option key={c.value} value={c.value}>
               {c.label}
-            </button>
+            </option>
           ))}
+        </select>
+        <select
+          value={yearLevel}
+          onChange={(e) => setParam('year_level', e.target.value)}
+          className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+        >
+          {yearLevels.map((y) => (
+            <option key={y.value} value={y.value}>
+              {y.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={course}
+          onChange={(e) => setParam('course', e.target.value)}
+          className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+        >
+          {courses.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+        <div className="relative sm:ml-auto">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setParam('search', e.target.value)}
+            placeholder="Search materials…"
+            className="w-full rounded-xl border border-slate-300 py-2 pr-3 pl-9 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 sm:w-64"
+          />
         </div>
       </div>
 

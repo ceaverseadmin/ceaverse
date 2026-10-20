@@ -19,17 +19,14 @@ import {
   EbookDetailPage,
   EbooksAdminPage,
   EbooksPage,
-  FloorPlansAdminPage,
-  FloorPlansPage,
   LostFoundAdminPage,
   LostFoundPage,
   LostFoundSubmitPage,
-  LostFoundTrackPage,
+  NavigateAdminPage,
+  NavigatePage,
   UsersPage,
   VoiceAdminPage,
   VoicePage,
-  WayfindingAdminPage,
-  WayfindingPage,
 } from './lazyRoutes'
 
 function withSuspense(node: React.ReactNode) {
@@ -44,10 +41,16 @@ const publicRoutes: RouteObject = {
     { path: '/library/:id', element: withSuspense(<EbookDetailPage />) },
     { path: '/lost-found', element: withSuspense(<LostFoundPage />) },
     { path: '/lost-found/submit', element: withSuspense(<LostFoundSubmitPage />) },
-    { path: '/lost-found/track', element: withSuspense(<LostFoundTrackPage />) },
     { path: '/voice', element: withSuspense(<VoicePage />) },
-    { path: '/floor-plans', element: withSuspense(<FloorPlansPage />) },
-    { path: '/wayfinding', element: withSuspense(<WayfindingPage />) },
+    { path: '/navigate', element: withSuspense(<NavigatePage />) },
+    {
+      path: '/floor-plans',
+      element: <Navigate to="/navigate" replace />,
+    },
+    {
+      path: '/wayfinding',
+      element: <Navigate to="/navigate" replace />,
+    },
   ],
 }
 
@@ -69,8 +72,15 @@ const adminRoutes: RouteObject = {
             { path: 'lost-found', element: withSuspense(<LostFoundAdminPage />) },
             { path: 'voice', element: withSuspense(<VoiceAdminPage />) },
             { path: 'content', element: withSuspense(<ContentPage />) },
-            { path: 'floor-plans', element: withSuspense(<FloorPlansAdminPage />) },
-            { path: 'wayfinding', element: withSuspense(<WayfindingAdminPage />) },
+            { path: 'navigate', element: withSuspense(<NavigateAdminPage />) },
+            {
+              path: 'wayfinding',
+              element: <Navigate to="/admin/navigate" replace />,
+            },
+            {
+              path: 'floor-plans',
+              element: <Navigate to="/admin/navigate" replace />,
+            },
             { path: 'admin', element: <AdminManagementPage /> },
             { path: 'users', element: withSuspense(<UsersPage />) },
             { path: 'profile', element: <ProfilePage /> },

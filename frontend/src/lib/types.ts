@@ -86,7 +86,8 @@ export interface Book {
   author: string
   description: string
   cover: string | null
-  file: string
+  file: string | null
+  url: string
   category: string
   year_level: string
   course: string
@@ -101,6 +102,7 @@ export interface BookFilters {
   category?: string
   year_level?: string
   course?: string
+  is_active?: boolean
   search?: string
   page?: number
 }
@@ -113,26 +115,6 @@ export type LostFoundType = 'lost' | 'found'
 
 export interface LostFoundItem {
   id: string
-  item_type: LostFoundType
-  category: string
-  title: string
-  description: string
-  location: string
-  date: string | null
-  image: string | null
-  status: string
-  claimed_at: string | null
-  created_at: string
-}
-
-export interface LostFoundSubmission extends Omit<LostFoundItem, 'status'> {
-  tracking_code: string
-  contact_name: string
-  contact_email: string
-}
-
-export interface TrackResult {
-  tracking_code: string
   item_type: LostFoundType
   category: string
   title: string

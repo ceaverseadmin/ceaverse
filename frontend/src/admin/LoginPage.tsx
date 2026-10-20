@@ -59,8 +59,8 @@ export default function LoginPage() {
             The home of the Engineering &amp; Architecture Student Council.
           </h1>
           <p className="mt-4 text-brand-100/90">
-            Manage ebooks, floor plans, wayfinding, lost &amp; found, and student voice
-            — all in one place.
+            Manage ebooks, campus navigation, lost &amp; found, and student voice — all
+            in one place.
           </p>
         </div>
         <p className="relative text-xs text-brand-200/70">

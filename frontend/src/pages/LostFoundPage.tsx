@@ -44,20 +44,12 @@ export default function LostFoundPage() {
         title="Lost &amp; Found"
         subtitle="Lost something? Found something? Help the community reunite."
         actions={
-          <>
-            <Link
-              to="/lost-found/submit"
-              className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
-            >
-              Report an item
-            </Link>
-            <Link
-              to="/lost-found/track"
-              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-            >
-              Check a report
-            </Link>
-          </>
+          <Link
+            to="/lost-found/submit"
+            className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
+          >
+            Report an item
+          </Link>
         }
       />
 
@@ -237,6 +229,25 @@ function ItemDetailModal({
             </p>
           )}
 
+          {(item.contact_name || item.contact_email) && (
+            <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Contact
+              </p>
+              {item.contact_name && (
+                <p className="mt-1 font-medium text-slate-800">{item.contact_name}</p>
+              )}
+              {item.contact_email && (
+                <a
+                  href={`mailto:${item.contact_email}`}
+                  className="text-brand-600 transition hover:text-brand-700"
+                >
+                  {item.contact_email}
+                </a>
+              )}
+            </div>
+          )}
+
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
             <button
               onClick={onClose}
@@ -250,7 +261,7 @@ function ItemDetailModal({
                 disabled={claiming}
                 className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:opacity-50"
               >
-                {claiming ? 'Claiming…' : 'Claimed'}
+                {claiming ? 'Claiming…' : 'Mark as claimed'}
               </button>
             ) : (
               <button

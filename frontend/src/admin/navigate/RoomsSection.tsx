@@ -1,14 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ErrorState, Spinner } from '../components/Feedback'
+import { ErrorState, Spinner } from '../../components/Feedback'
+import { Modal } from '../../components/Modal'
 import {
   createLocation,
   deleteLocation,
   fetchBuildingsAdmin,
   fetchLocationsAdmin,
   updateLocation,
-} from '../lib/adminServices'
-import type { RoomLocation } from '../lib/types'
+} from '../../lib/adminServices'
+import type { RoomLocation } from '../../lib/types'
 
 const inputClass =
   'rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
@@ -23,7 +24,7 @@ const categories = [
   'other',
 ]
 
-export default function WayfindingAdminPage() {
+export function RoomsSection() {
   const queryClient = useQueryClient()
   const buildings = useQuery({
     queryKey: ['admin-buildings'],
@@ -36,9 +37,17 @@ export default function WayfindingAdminPage() {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<RoomLocation | null>(null)
 
+  const closeForm = () => {
+    setShowForm(false)
+    setEditing(null)
+  }
+
   const removeMutation = useMutation({
     mutationFn: deleteLocation,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-locations'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-locations'] })
+      queryClient.invalidateQueries({ queryKey: ['locations'] })
+    },
   })
 
   if (isLoading || buildings.isLoading) return <Spinner />
@@ -48,27 +57,26 @@ export default function WayfindingAdminPage() {
   const buildingMap = new Map(buildings.data.results.map((b) => [b.id, b.name]))
 
   return (
-    <div className="p-4 sm:p-8">
-      <h1 className="text-2xl font-bold text-slate-900">Wayfinding</h1>
-      <p className="mt-1 text-slate-500">Manage building locations and rooms.</p>
-
-      <div className="mt-6 flex justify-end">
+    <div>
+      <div className="flex justify-end">
         <button
           onClick={() => {
             setEditing(null)
-            setShowForm((v) => !v)
+            setShowForm(true)
           }}
           className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
         >
-          {showForm && !editing ? 'Close' : 'Add location'}
+          Add location
         </button>
       </div>
       {(showForm || editing) && (
-        <LocationForm
-          buildings={buildings.data.results.map((b) => ({ id: b.id, name: b.name }))}
-          location={editing}
-          onDone={() => setShowForm(false)}
-        />
+        <Modal title={editing ? 'Edit location' : 'Add location'} onClose={closeForm}>
+          <LocationForm
+            buildings={buildings.data.results.map((b) => ({ id: b.id, name: b.name }))}
+            location={editing}
+            onDone={closeForm}
+          />
+        </Modal>
       )}
 
       <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -175,6 +183,7 @@ function LocationForm({
       location ? updateLocation(location.id, payload) : createLocation(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-locations'] })
+      queryClient.invalidateQueries({ queryKey: ['locations'] })
       onDone()
     },
   })
@@ -188,19 +197,13 @@ function LocationForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mt-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-    >
-      <h2 className="font-semibold text-slate-900">
-        {location ? 'Edit location' : 'Add location'}
-      </h2>
+    <form onSubmit={handleSubmit}>
       {mutation.isError && (
-        <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
+        <p className="mb-4 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">
           Could not save.
         </p>
       )}
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <select
           value={form.building}
           onChange={(e) => update('building', e.target.value)}

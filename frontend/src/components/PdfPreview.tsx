@@ -1,12 +1,6 @@
 import { useCallback, useState } from 'react'
-import { Document, Page, pdfjs } from 'react-pdf'
-import 'react-pdf/dist/Page/AnnotationLayer.css'
-import 'react-pdf/dist/Page/TextLayer.css'
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString()
+import { Document, Page } from 'react-pdf'
+import '../lib/pdfjs'
 
 interface PdfPreviewProps {
   url: string

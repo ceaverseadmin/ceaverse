@@ -9,10 +9,8 @@ import type {
   LandingContent,
   LocationFilters,
   LostFoundItem,
-  LostFoundSubmission,
   Paginated,
   RoomLocation,
-  TrackResult,
   VoicePost,
   VoiceWallItem,
 } from './types'
@@ -59,18 +57,11 @@ export async function fetchLostFound(
   return unwrap(data)
 }
 
-export async function submitLostFound(payload: FormData): Promise<LostFoundSubmission> {
-  const { data } = await api.post<ApiEnvelope<LostFoundSubmission>>(
+export async function submitLostFound(payload: FormData): Promise<LostFoundItem> {
+  const { data } = await api.post<ApiEnvelope<LostFoundItem>>(
     '/lost-found/items/',
     payload,
     { headers: { 'Content-Type': 'multipart/form-data' } },
-  )
-  return unwrap(data)
-}
-
-export async function trackLostFound(code: string): Promise<TrackResult> {
-  const { data } = await api.get<ApiEnvelope<TrackResult>>(
-    `/lost-found/track/${encodeURIComponent(code)}/`,
   )
   return unwrap(data)
 }

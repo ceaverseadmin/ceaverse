@@ -10,7 +10,7 @@ IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 PDF_EXTENSIONS = {"pdf"}
 
 IMAGE_MAX_SIZE_MB = 5
-PDF_MAX_SIZE_MB = 20
+PDF_MAX_SIZE_MB = 10
 
 
 def _validate(file, allowed_extensions, max_size_mb, label):

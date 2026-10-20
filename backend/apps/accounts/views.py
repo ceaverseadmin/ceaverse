@@ -15,7 +15,6 @@ from .models import ActivityLog
 from .permissions import IsSuperAdmin
 from .serializers import (
     ActivityLogSerializer,
-    ApproveUserSerializer,
     CreateUserSerializer,
     EmailTokenObtainPairSerializer,
     ResetPasswordSerializer,

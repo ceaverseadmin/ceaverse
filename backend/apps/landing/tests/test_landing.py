@@ -5,7 +5,7 @@ import re
 import pytest
 from accounts.tests.factories import PASSWORD, AdminFactory, SuperAdminFactory, UserFactory
 from django.core.files.uploadedfile import SimpleUploadedFile
-from landing.models import DownloadableLink, Hero, ServiceCard
+from landing.models import AboutSection, DownloadableLink, Hero, ServiceCard
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -121,6 +121,42 @@ class TestSingletonSections:
         response = api_client.get(HERO_URL, **headers)
         assert response.status_code == status.HTTP_200_OK
         assert Hero.objects.count() == 1
+
+    def test_admin_can_remove_hero_image(self, api_client, admin_user):
+        background = SimpleUploadedFile("hero.png", PNG_1PX, content_type="image/png")
+        hero = Hero.objects.create(title="Welcome", background_image=background)
+        headers = auth_headers(api_client, admin_user)
+        response = api_client.patch(
+            HERO_URL, {"remove_image": True}, format="json", **headers
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert env(response)["data"]["background_image"] is None
+        hero.refresh_from_db()
+        assert not hero.background_image
+
+    def test_admin_can_remove_about_image(self, api_client, admin_user):
+        image = SimpleUploadedFile("about.png", PNG_1PX, content_type="image/png")
+        about = AboutSection.objects.create(title="About us", image=image)
+        headers = auth_headers(api_client, admin_user)
+        response = api_client.patch(
+            ABOUT_URL, {"remove_image": True}, format="json", **headers
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert env(response)["data"]["image"] is None
+        about.refresh_from_db()
+        assert not about.image
+
+    def test_hero_image_kept_without_remove_flag(self, api_client, admin_user):
+        background = SimpleUploadedFile("hero.png", PNG_1PX, content_type="image/png")
+        hero = Hero.objects.create(title="Welcome", background_image=background)
+        headers = auth_headers(api_client, admin_user)
+        response = api_client.patch(
+            HERO_URL, {"title": "EA-CSC"}, format="json", **headers
+        )
+        assert response.status_code == status.HTTP_200_OK
+        hero.refresh_from_db()
+        assert hero.background_image
+        assert env(response)["data"]["background_image"].endswith(".png")
 
     def test_officer_cannot_update(self, api_client, officer):
         headers = auth_headers(api_client, officer)
