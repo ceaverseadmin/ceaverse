@@ -23,6 +23,7 @@ export default function LostFoundPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['lost-found', active.value],
     queryFn: () => fetchLostFound(active.params),
+    staleTime: 60_000,
   })
 
   const claimMutation = useMutation({

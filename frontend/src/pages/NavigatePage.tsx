@@ -62,6 +62,7 @@ export default function NavigatePage() {
   } = useQuery({
     queryKey: ['buildings'],
     queryFn: fetchBuildings,
+    staleTime: 15 * 60_000,
   })
 
   const allMode = buildingParam === ALL_BUILDINGS
@@ -75,6 +76,7 @@ export default function NavigatePage() {
     queryKey: ['building', selectedBuilding?.id],
     queryFn: () => fetchBuilding(selectedBuilding!.id),
     enabled: Boolean(selectedBuilding?.id),
+    staleTime: 15 * 60_000,
   })
 
   const floorPlans = detail?.floor_plans ?? []
@@ -91,6 +93,7 @@ export default function NavigatePage() {
         page,
       }),
     enabled: !buildingsLoading && !buildingsError,
+    staleTime: 5 * 60_000,
   })
 
   const buildingNameById = new Map(

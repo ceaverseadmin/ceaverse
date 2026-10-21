@@ -51,6 +51,7 @@ export default function EbooksPage() {
         course: course || undefined,
         search: search || undefined,
       }),
+    staleTime: 10 * 60_000,
   })
 
   const setParam = (key: string, value: string) =>

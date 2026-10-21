@@ -12,6 +12,7 @@ export default function EbookDetailPage() {
     queryKey: ['book', id],
     queryFn: () => fetchBook(id!),
     enabled: Boolean(id),
+    staleTime: 10 * 60_000,
   })
 
   if (isLoading) return <BookDetailSkeleton />

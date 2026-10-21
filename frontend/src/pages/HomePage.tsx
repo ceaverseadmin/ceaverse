@@ -65,6 +65,7 @@ export default function HomePage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['landing'],
     queryFn: fetchLandingContent,
+    staleTime: 15 * 60_000,
   })
 
   if (isLoading) return <HomePageSkeleton />

@@ -32,6 +32,7 @@ export default function VoicePage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['voice', category],
     queryFn: () => fetchVoiceWall(category || undefined),
+    staleTime: 60_000,
   })
 
   const mutation = useMutation({
