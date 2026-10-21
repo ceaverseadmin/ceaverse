@@ -83,17 +83,13 @@ export default function HomePage() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-950 text-white">
-        {hero.background_image && (
-          <>
-            <img
-              src={hero.background_image}
-              alt=""
-              aria-hidden
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div aria-hidden className="absolute inset-0 bg-brand-950/85" />
-          </>
-        )}
+        <img
+          src="/cea-bldg.jpeg"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div aria-hidden className="absolute inset-0 bg-brand-950/60" />
         <div
           aria-hidden
           className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"
