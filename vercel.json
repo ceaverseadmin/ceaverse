@@ -29,7 +29,7 @@
       ]
     },
     {
-      "source": "/workbox-*.js",
+      "source": "/workbox-(.*).js",
       "headers": [
         {
           "key": "Cache-Control",
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "source": "/pwa-*.png",
+      "source": "/pwa-(.*).png",
       "headers": [
         {
           "key": "Cache-Control",
@@ -56,7 +56,7 @@
       ]
     },
     {
-      "source": "/maskable-*.png",
+      "source": "/maskable-(.*).png",
       "headers": [
         {
           "key": "Cache-Control",
