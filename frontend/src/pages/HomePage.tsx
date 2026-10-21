@@ -272,7 +272,7 @@ export default function HomePage() {
               aria-hidden
               className="absolute inset-0 h-full w-full object-cover"
             />
-            <div aria-hidden className="absolute inset-0 bg-brand-900/85" />
+            <div aria-hidden className="absolute inset-0 bg-brand-900/95" />
             <div className="relative">
               <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
                 Get involved
