@@ -10,7 +10,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: null,
-      includeAssets: [],
+      includeAssets: ['cea-bldg.jpeg', 'labldg.png', 'cea-logo.png', 'eacsc.png', 'icpep.png'],
       manifest: {
         name: 'Ceaverse Portal',
         short_name: 'Ceaverse',
@@ -43,7 +43,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,svg}', 'apple-touch-icon.png'],
+        globPatterns: ['**/*.{js,css,html,ico,svg,png,jpg,jpeg}', 'apple-touch-icon.png'],
         globIgnores: ['**/pdf.worker*'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html',
@@ -104,7 +104,7 @@ export default defineConfig({
             options: {
               cacheName: 'static-images',
               expiration: {
-                maxEntries: 60,
+                maxEntries: 100,
                 maxAgeSeconds: 30 * 24 * 60 * 60,
               },
               cacheableResponse: {
