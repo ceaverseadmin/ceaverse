@@ -210,10 +210,6 @@ class PasswordResetRequestView(APIView):
                 # Send email
                 subject = render_to_string("registration/password_reset_subject.txt").strip()
                 context = {
-                    "protocol": "https" if not settings.DEBUG else "http",
-                    "domain": getattr(settings, "EMAIL_DOMAIN", "127.0.0.1:8000"),
-                    "uid": uid,
-                    "token": token,
                     "reset_link": reset_link,
                     "frontend_url": settings.FRONTEND_URL,
                 }
