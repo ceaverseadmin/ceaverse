@@ -3,6 +3,8 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'
+
 export default function LoginPage() {
   const { user, isAdmin, login } = useAuth()
   const [email, setEmail] = useState('')
@@ -142,7 +144,7 @@ export default function LoginPage() {
               </button>
               <div className="mt-4 text-center">
                 <a
-                  href="/auth/password-reset/"
+                  href={`${BACKEND_URL}/auth/password-reset/`}
                   className="text-sm text-brand-600 transition hover:text-brand-700"
                 >
                   Forgot password?
