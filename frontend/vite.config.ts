@@ -10,7 +10,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: null,
-      includeAssets: ['cea-bldg.jpeg', 'labldg.png', 'cea-logo.png', 'eacsc.png', 'icpep.png'],
+      includeAssets: ['cea-bg.jpeg', 'labldg.png', 'cea-logo.png', 'eacsc.png', 'icpep.png'],
       manifest: {
         name: 'Ceaverse Portal',
         short_name: 'Ceaverse',

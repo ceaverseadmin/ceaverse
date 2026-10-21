@@ -102,7 +102,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-950 text-white">
         <img
-          src="/cea-bldg.jpeg"
+          src="/cea-bg.jpeg"
           alt=""
           aria-hidden
           loading="eager"
