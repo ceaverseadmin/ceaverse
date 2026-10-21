@@ -12,8 +12,8 @@ export default defineConfig({
       injectRegister: null,
       includeAssets: [],
       manifest: {
-        name: 'EA-CSC Web Portal',
-        short_name: 'EA-CSC',
+        name: 'Ceaverse Portal',
+        short_name: 'Ceaverse',
         description:
           'Ebooks, floor plans, wayfinding, lost & found, and student voice for Engineering & Architecture students.',
         theme_color: '#180404',
