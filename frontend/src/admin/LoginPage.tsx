@@ -140,6 +140,14 @@ export default function LoginPage() {
               >
                 {submitting ? 'Signing in…' : 'Sign in'}
               </button>
+              <div className="mt-4 text-center">
+                <a
+                  href="/auth/password-reset/"
+                  className="text-sm text-brand-600 transition hover:text-brand-700"
+                >
+                  Forgot password?
+                </a>
+              </div>
             </form>
             <p className="mt-4 text-center text-sm text-slate-600">
               Don't have an account?{' '}
