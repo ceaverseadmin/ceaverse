@@ -199,26 +199,26 @@ class PasswordResetRequestView(APIView):
         user = User.objects.filter(email=email, is_active=True).first()
 
         if user:
-            # Generate password reset token
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-            # Build reset link pointing to frontend
-            reset_link = f"{settings.FRONTEND_URL}/admin/reset-password/?uid={uid}&token={token}"
-
-            # Send email
-            subject = render_to_string("registration/password_reset_subject.txt").strip()
-            context = {
-                "protocol": "https" if not settings.DEBUG else "http",
-                "domain": getattr(settings, "EMAIL_DOMAIN", "127.0.0.1:8000"),
-                "uid": uid,
-                "token": token,
-                "reset_link": reset_link,
-                "frontend_url": settings.FRONTEND_URL,
-            }
-            html_message = render_to_string("registration/password_reset_email.html", context)
-
             try:
+                # Generate password reset token
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+                # Build reset link pointing to frontend
+                reset_link = f"{settings.FRONTEND_URL}/admin/reset-password/?uid={uid}&token={token}"
+
+                # Send email
+                subject = render_to_string("registration/password_reset_subject.txt").strip()
+                context = {
+                    "protocol": "https" if not settings.DEBUG else "http",
+                    "domain": getattr(settings, "EMAIL_DOMAIN", "127.0.0.1:8000"),
+                    "uid": uid,
+                    "token": token,
+                    "reset_link": reset_link,
+                    "frontend_url": settings.FRONTEND_URL,
+                }
+                html_message = render_to_string("registration/password_reset_email.html", context)
+
                 send_mail(
                     subject,
                     "",  # Plain text body - we only send HTML
@@ -231,7 +231,7 @@ class PasswordResetRequestView(APIView):
                 # Log error but don't reveal to user
                 import logging
                 logger = logging.getLogger(__name__)
-                logger.error(f"Failed to send password reset email: {e}")
+                logger.error(f"Failed to send password reset email: {e}", exc_info=True)
 
         return Response(
             {
