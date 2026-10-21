@@ -1,10 +1,16 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -166,6 +172,165 @@ class SignupView(APIView):
                 "errors": serializer.errors,
             },
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class PasswordResetRequestView(APIView):
+    """Request a password reset link via email."""
+
+    permission_classes = (AllowAny,)
+    throttle_classes = (AnonRateThrottle,)
+    throttle_rate = "10/hour"
+
+    def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return Response(
+                {
+                    "success": False,
+                    "message": "Email is required.",
+                    "data": None,
+                    "errors": {"email": ["This field is required."]},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Always return success to prevent email enumeration
+        user = User.objects.filter(email=email, is_active=True).first()
+
+        if user:
+            # Generate password reset token
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            # Build reset link pointing to frontend
+            reset_link = f"{settings.FRONTEND_URL}/admin/reset-password/?uid={uid}&token={token}"
+
+            # Send email
+            subject = render_to_string("registration/password_reset_subject.txt").strip()
+            context = {
+                "protocol": "https" if not settings.DEBUG else "http",
+                "domain": getattr(settings, "EMAIL_DOMAIN", "127.0.0.1:8000"),
+                "uid": uid,
+                "token": token,
+                "reset_link": reset_link,
+                "frontend_url": settings.FRONTEND_URL,
+            }
+            html_message = render_to_string("registration/password_reset_email.html", context)
+
+            try:
+                send_mail(
+                    subject,
+                    "",  # Plain text body - we only send HTML
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+            except Exception as e:
+                # Log error but don't reveal to user
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to send password reset email: {e}")
+
+        return Response(
+            {
+                "success": True,
+                "message": "If that email is registered, we've sent a password reset link.",
+                "data": None,
+                "errors": None,
+            }
+        )
+
+
+class PasswordResetConfirmView(APIView):
+    """Confirm password reset and set new password."""
+
+    permission_classes = (AllowAny,)
+    throttle_classes = (AnonRateThrottle,)
+    throttle_rate = "10/hour"
+
+    def post(self, request):
+        uid = request.data.get("uid")
+        token = request.data.get("token")
+        new_password = request.data.get("new_password")
+
+        if not all([uid, token, new_password]):
+            return Response(
+                {
+                    "success": False,
+                    "message": "uid, token, and new_password are required.",
+                    "data": None,
+                    "errors": {
+                        "uid": ["This field is required."],
+                        "token": ["This field is required."],
+                        "new_password": ["This field is required."],
+                    },
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_pk = force_str(urlsafe_base64_decode(uid))
+            user = User.objects.get(pk=user_pk)
+        except (ValueError, User.DoesNotExist):
+            return Response(
+                {
+                    "success": False,
+                    "message": "Invalid reset link.",
+                    "data": None,
+                    "errors": None,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Validate token
+        if not default_token_generator.check_token(user, token):
+            return Response(
+                {
+                    "success": False,
+                    "message": "Invalid or expired reset link.",
+                    "data": None,
+                    "errors": None,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Validate password using Django's validators
+        from django.contrib.auth.password_validation import validate_password
+        try:
+            validate_password(new_password, user)
+        except Exception as e:
+            return Response(
+                {
+                    "success": False,
+                    "message": "Password does not meet requirements.",
+                    "data": None,
+                    "errors": {"new_password": list(e.messages)},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Set new password
+        user.set_password(new_password)
+        user.save(update_fields=["password"])
+
+        log_action(
+            user,
+            ActivityLog.Action.UPDATE,
+            model_name="User",
+            object_id=user.id,
+            details={"action": "password_reset"},
+            request=request,
+        )
+
+        return Response(
+            {
+                "success": True,
+                "message": "Password has been reset successfully.",
+                "data": None,
+                "errors": None,
+            }
         )
 
 

@@ -45,6 +45,13 @@ if render_hostname:
 # Override frontend URL for production
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://ceaverse-dev.vercel.app")
 
+# Override email domain for production
+EMAIL_DOMAIN = os.environ.get("EMAIL_DOMAIN", render_hostname)
+
+# Switch to SMTP backend if Brevo credentials are configured
+if os.environ.get("EMAIL_HOST_PASSWORD"):
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
 # django-csp 4.x reads CONTENT_SECURITY_POLICY; the legacy CSP_* settings are
 # no longer supported. Exclude the Django admin because it uses inline scripts.
 CONTENT_SECURITY_POLICY = {

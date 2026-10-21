@@ -25,6 +25,12 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 # Frontend URL for password reset redirects
 FRONTEND_URL = env("FRONTEND_URL", default="http://127.0.0.1:5173")
 
+# Email domain for email links (backend domain where API is hosted)
+EMAIL_DOMAIN = env("EMAIL_DOMAIN", default="127.0.0.1:8000")
+
+# Password reset token expiration (3 hours)
+PASSWORD_RESET_TIMEOUT = timedelta(hours=3)
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

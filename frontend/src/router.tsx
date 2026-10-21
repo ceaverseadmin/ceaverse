@@ -7,6 +7,8 @@ import RequireAdmin from './auth/RequireAdmin'
 import AdminLayout from './admin/AdminLayout'
 import LoginPage from './admin/LoginPage'
 import SignupPage from './admin/SignupPage'
+import ForgotPasswordPage from './admin/ForgotPasswordPage'
+import ResetPasswordPage from './admin/ResetPasswordPage'
 import DashboardPage from './admin/DashboardPage'
 import AdminManagementPage from './admin/AdminManagementPage'
 import PendingApprovalPage from './admin/PendingApprovalPage'
@@ -60,6 +62,8 @@ const adminRoutes: RouteObject = {
     { index: true, element: <Navigate to="/admin/dashboard" replace /> },
     { path: 'login', element: <LoginPage /> },
     { path: 'signup', element: <SignupPage /> },
+    { path: 'forgot-password', element: <ForgotPasswordPage /> },
+    { path: 'reset-password', element: <ResetPasswordPage /> },
     { path: 'pending-approval', element: <PendingApprovalPage /> },
     {
       element: <RequireAdmin />,
