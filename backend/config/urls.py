@@ -8,8 +8,8 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.static import serve
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     # Password reset (Django built-in HTML views - not API endpoints)
+    # Must come before admin/ to avoid Django admin's default auth URLs
     path(
         "auth/password-reset/",
         auth_views.PasswordResetView.as_view(
@@ -42,6 +42,7 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    path("admin/", admin.site.urls),
     # API endpoints
     path("api/", include("accounts.urls")),
     path("api/landing/", include("landing.urls")),
