@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from ebooks.models import Book
 from floorplans.models import Building
 from lost_found.models import LostFoundItem
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from student_voice.models import VoiceSubmission
@@ -68,6 +69,29 @@ class DashboardSummaryView(APIView):
                     "recent_activity": ActivityLogSerializer(
                         recent_activity, many=True
                     ).data,
+                },
+                "errors": None,
+            }
+        )
+
+
+class PublicStatsView(APIView):
+    """Public stats for hero section: library items, rooms, buildings, items returned."""
+
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        return Response(
+            {
+                "success": True,
+                "message": None,
+                "data": {
+                    "books": Book.objects.filter(is_active=True).count(),
+                    "rooms": RoomLocation.objects.filter(is_active=True).count(),
+                    "buildings": Building.objects.filter(is_active=True).count(),
+                    "items_returned": LostFoundItem.objects.filter(
+                        status=LostFoundItem.Status.RESOLVED
+                    ).count(),
                 },
                 "errors": None,
             }

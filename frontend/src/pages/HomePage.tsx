@@ -9,11 +9,18 @@ import {
   Target,
   type LucideIcon,
 } from 'lucide-react'
-import { HeroPreview } from '../components/HeroPreview'
 import { LogoMarquee } from '../components/LogoMarquee'
 import { ErrorState } from '../components/Feedback'
 import { HomePageSkeleton } from '../components/PublicSkeletons'
 import { fetchLandingContent } from '../lib/services'
+import { api, unwrap } from '../lib/api'
+
+interface PublicStats {
+  books: number
+  rooms: number
+  buildings: number
+  items_returned: number
+}
 
 function SectionHeading({
   eyebrow,
@@ -68,6 +75,15 @@ export default function HomePage() {
     staleTime: 15 * 60_000,
   })
 
+  const { data: statsData } = useQuery<PublicStats>({
+    queryKey: ['public-stats'],
+    queryFn: async () => {
+      const { data } = await api.get('/dashboard/public-stats/')
+      return unwrap(data)
+    },
+    staleTime: 5 * 60_000,
+  })
+
   if (isLoading) return <HomePageSkeleton />
   if (isError || !data)
     return <ErrorState message="Could not load the portal content." />
@@ -79,6 +95,8 @@ export default function HomePage() {
     !hero.cta_url || hero.cta_url === '/ebooks' ? '/library' : hero.cta_url
   const ctaIsInternal = ctaHref.startsWith('/')
 
+  const stats: PublicStats = statsData || { books: 0, rooms: 0, buildings: 0, items_returned: 0 }
+
   return (
     <div>
       {/* Hero */}
@@ -87,9 +105,11 @@ export default function HomePage() {
           src="/cea-bldg.jpeg"
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
-        <div aria-hidden className="absolute inset-0 bg-brand-950/60" />
+        <div aria-hidden className="absolute inset-0 bg-brand-950/50" />
         <div
           aria-hidden
           className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"
@@ -100,60 +120,78 @@ export default function HomePage() {
         />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.07),transparent_60%)]" />
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-20 md:py-24 lg:grid-cols-2 lg:gap-16 lg:py-28">
-          <div className="max-w-xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-brand-600/40 bg-brand-900/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-brand-200">
-              <span className="relative flex h-2 w-2" aria-hidden>
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
-              </span>
-              Engineering &amp; Architecture Student Council
-            </p>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-white md:text-5xl">
-              {hero.title || 'The CEAVERSE Web Portal'}
-            </h1>
-            {hero.subtitle && (
-              <p className="mt-5 text-lg leading-relaxed text-brand-100/90">
-                {hero.subtitle}
-              </p>
-            )}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              {ctaIsInternal ? (
-                <Link
-                  to={ctaHref}
-                  className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-brand-900 shadow-lg shadow-black/20 transition hover:bg-brand-50"
-                >
-                  {ctaLabel}
-                  <ArrowRight
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    aria-hidden
-                  />
-                </Link>
-              ) : (
-                <a
-                  href={ctaHref}
-                  className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-brand-900 shadow-lg shadow-black/20 transition hover:bg-brand-50"
-                >
-                  {ctaLabel}
-                  <ArrowRight
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    aria-hidden
-                  />
-                </a>
-              )}
+        <div className="relative mx-auto max-w-3xl px-4 py-20 text-center md:py-24 lg:py-28">
+          <p className="inline-flex items-center gap-2 rounded-full border border-brand-600/40 bg-brand-900/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-brand-200 fade-up animate-delay-100">
+            <span className="relative flex h-2 w-2" aria-hidden>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
+            </span>
+            College of Engineering and Architecture
+          </p>
+          <h1 className="mt-6 text-5xl font-bold leading-[1.1] tracking-tight text-white break-words md:text-6xl lg:text-7xl fade-up animate-delay-200">
+            {hero.title || 'Welcome to CEAVERSE Web Portal'}
+          </h1>
+          <p className="mt-5 text-lg leading-relaxed text-brand-100/90 md:text-xl fade-up animate-delay-300">
+            {hero.subtitle || 'Access study materials, report lost items, find rooms, and share your voice with the student council.'}
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center fade-up animate-delay-400">
+            {ctaIsInternal ? (
               <Link
-                to="/lost-found"
-                className="inline-flex items-center justify-center rounded-xl border border-white/25 px-7 py-3.5 font-semibold text-white transition hover:bg-white/10"
+                to={ctaHref}
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-brand-900 shadow-lg shadow-black/20 transition hover:bg-brand-50"
               >
-                Report an item
+                {ctaLabel}
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden
+                />
               </Link>
-            </div>
-            <p className="mt-10 text-xs font-semibold uppercase tracking-[0.18em] text-brand-200/75">
-              Ebooks · Lost &amp; Found · Navigate · Student Voice
-            </p>
+            ) : (
+              <a
+                href={ctaHref}
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-brand-900 shadow-lg shadow-black/20 transition hover:bg-brand-50"
+              >
+                {ctaLabel}
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden
+                />
+              </a>
+            )}
+            <Link
+              to="/lost-found"
+              className="inline-flex items-center justify-center rounded-xl border border-white/25 px-7 py-3.5 font-semibold text-white transition hover:bg-white/10"
+            >
+              Report an item
+            </Link>
           </div>
 
-          <HeroPreview />
+          {/* Stats */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-brand-200/90 md:gap-8 fade-up animate-delay-500">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-white">{stats.books}+</span>
+              <span>Study Materials</span>
+            </div>
+            <span className="hidden text-brand-400/50 md:inline">•</span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-white">{stats.rooms}+</span>
+              <span>Laboratory Rooms</span>
+            </div>
+            <span className="hidden text-brand-400/50 md:inline">•</span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-white">{stats.buildings}</span>
+              <span>Buildings Mapped</span>
+            </div>
+            <span className="hidden text-brand-400/50 md:inline">•</span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-white">{stats.items_returned}+</span>
+              <span>Items Returned</span>
+            </div>
+          </div>
+
+          <p className="mt-10 text-xs font-semibold uppercase tracking-[0.18em] text-brand-200/75 fade-up animate-delay-500">
+            Ebooks · Lost &amp; Found · Navigate · Student Voice
+          </p>
         </div>
       </section>
 
