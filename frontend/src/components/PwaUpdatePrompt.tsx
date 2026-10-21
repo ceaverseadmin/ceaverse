@@ -9,6 +9,14 @@ export default function PwaUpdatePrompt() {
 
   if (!needRefresh) return null
 
+  const handleRefresh = () => {
+    updateServiceWorker(true)
+    // Force page reload after a short delay to ensure SW updates
+    setTimeout(() => {
+      window.location.reload()
+    }, 500)
+  }
+
   return (
     <div
       role="status"
@@ -28,7 +36,7 @@ export default function PwaUpdatePrompt() {
         <div className="mt-3 flex items-center gap-2">
           <button
             type="button"
-            onClick={() => updateServiceWorker(true)}
+            onClick={handleRefresh}
             className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700"
           >
             Refresh now
