@@ -265,11 +265,14 @@ export default function HomePage() {
       {/* CTA */}
       <section className="bg-slate-50">
         <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-800 via-brand-700 to-brand-900 px-8 py-12 text-white shadow-card-hover md:flex md:items-center md:justify-between">
-            <div
+          <div className="relative overflow-hidden rounded-3xl px-8 py-12 text-white shadow-card-hover md:flex md:items-center md:justify-between">
+            <img
+              src="/labldg.png"
+              alt=""
               aria-hidden
-              className="pointer-events-none absolute -top-20 right-0 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+              className="absolute inset-0 h-full w-full object-cover"
             />
+            <div aria-hidden className="absolute inset-0 bg-brand-900/85" />
             <div className="relative">
               <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
                 Get involved

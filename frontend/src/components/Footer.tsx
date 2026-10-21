@@ -16,8 +16,16 @@ function FacebookIcon({ className = '' }: { className?: string }) {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-brand-800 bg-brand-700 text-white">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
+    <footer className="relative border-t border-brand-800 text-white">
+      <img
+        src="/labldg.png"
+        alt=""
+        aria-hidden
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div aria-hidden className="absolute inset-0 bg-brand-700/85" />
+      <div className="relative mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
           <p className="font-semibold text-white">CEAVERSE Web Portal</p>
           <p className="mt-2 text-sm text-white/75">
@@ -112,7 +120,7 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/70">
+      <div className="relative border-t border-white/10 py-4 text-center text-xs text-white/70">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-2 px-4 md:flex-row md:gap-3">
           <p>© 2026</p>
           <span className="flex items-center gap-1.5">
