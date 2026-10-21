@@ -42,6 +42,9 @@ if render_hostname:
     if render_origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(render_origin)
 
+# Override frontend URL for production
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://ceaverse-dev.vercel.app")
+
 # django-csp 4.x reads CONTENT_SECURITY_POLICY; the legacy CSP_* settings are
 # no longer supported. Exclude the Django admin because it uses inline scripts.
 CONTENT_SECURITY_POLICY = {

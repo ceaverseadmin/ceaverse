@@ -22,6 +22,9 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
+# Frontend URL for password reset redirects
+FRONTEND_URL = env("FRONTEND_URL", default="http://127.0.0.1:5173")
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

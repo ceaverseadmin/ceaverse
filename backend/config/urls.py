@@ -17,13 +17,15 @@ urlpatterns = [
             email_template_name="registration/password_reset_email.html",
             subject_template_name="registration/password_reset_subject.txt",
             success_url="/auth/password-reset/done/",
+            extra_context={"frontend_url": settings.FRONTEND_URL},
         ),
         name="password_reset",
     ),
     path(
         "auth/password-reset/done/",
         auth_views.PasswordResetDoneView.as_view(
-            template_name="registration/password_reset_done.html"
+            template_name="registration/password_reset_done.html",
+            extra_context={"frontend_url": settings.FRONTEND_URL},
         ),
         name="password_reset_done",
     ),
@@ -32,13 +34,15 @@ urlpatterns = [
         auth_views.PasswordResetConfirmView.as_view(
             template_name="registration/password_reset_confirm.html",
             success_url="/auth/reset/done/",
+            extra_context={"frontend_url": settings.FRONTEND_URL},
         ),
         name="password_reset_confirm",
     ),
     path(
         "auth/reset/done/",
         auth_views.PasswordResetCompleteView.as_view(
-            template_name="registration/password_reset_complete.html"
+            template_name="registration/password_reset_complete.html",
+            extra_context={"frontend_url": settings.FRONTEND_URL},
         ),
         name="password_reset_complete",
     ),
